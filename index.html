@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>设计师作品集 — DAMON</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">YN<span class="dot">.</span></a>
+      <ul class="nav-links">
+        <li><a href="#about">关于</a></li>
+        <li><a href="#work">作品</a></li>
+        <li><a href="#skills">技能</a></li>
+        <li><a href="#contact">联系</a></li>
+      </ul>
+      <button class="nav-toggle" id="navToggle" aria-label="菜单">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero" id="hero">
+    <div class="hero-bg">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+      <div class="blob blob-3"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        正在接受新项目
+      </div>
+      <h1 class="hero-title">
+        我是
+        <span class="highlight highlight-1">创意</span>
+        <br />设计师
+        <span class="highlight highlight-2">.</span>
+      </h1>
+      <p class="hero-desc">
+        专注于品牌视觉、UI/UX 与数字体验设计。<br />
+        用色彩与形式讲述有温度的故事。
+      </p>
+      <div class="hero-actions">
+        <a href="#work" class="btn btn-primary">查看作品</a>
+        <a href="#contact" class="btn btn-ghost">联系我</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-num">50+</span>
+          <span class="stat-label">完成项目</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-num">3+</span>
+          <span class="stat-label">年经验</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-num">20+</span>
+          <span class="stat-label">满意客户</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="avatar-ring">
+        <div class="avatar">
+          <div class="avatar-placeholder">
+            <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="40" cy="30" r="18" fill="white" fill-opacity="0.4"/>
+              <ellipse cx="40" cy="68" rx="26" ry="16" fill="white" fill-opacity="0.3"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="floating-tag tag-1">Figma</div>
+      <div class="floating-tag tag-2">Brand</div>
+      <div class="floating-tag tag-3">Motion</div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="about section" id="about">
+    <div class="container">
+      <div class="section-label">关于我</div>
+      <div class="about-grid">
+        <div class="about-text">
+          <h2 class="section-title">设计是沟通，<br />不只是装饰。</h2>
+          <p>你好！我是一名热爱创意的视觉设计师，专注于将想法转化为令人难忘的视觉体验。我相信好的设计不仅仅好看，更要传达清晰的信息、引发真实的情感。</p>
+          <p>无论是品牌识别系统、数字产品界面，还是动态视觉内容，我都致力于在功能与美感之间找到完美的平衡。</p>
+          <a href="#contact" class="btn btn-primary" style="margin-top:1.5rem;">一起合作</a>
+        </div>
+        <div class="about-cards">
+          <div class="about-card card-pink">
+            <div class="card-icon">✦</div>
+            <h3>品牌设计</h3>
+            <p>从 Logo 到完整视觉体系，构建有辨识度的品牌语言。</p>
+          </div>
+          <div class="about-card card-blue">
+            <div class="card-icon">◈</div>
+            <h3>UI/UX 设计</h3>
+            <p>以用户为中心，打造直觉易用的数字产品体验。</p>
+          </div>
+          <div class="about-card card-yellow">
+            <div class="card-icon">◉</div>
+            <h3>视觉创意</h3>
+            <p>插画、排版、动态设计，让内容更生动有力。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Work -->
+  <section class="work section" id="work">
+    <div class="container">
+      <div class="section-label">精选作品</div>
+      <div class="work-header">
+        <h2 class="section-title">近期项目</h2>
+        <div class="work-filter">
+          <button class="filter-btn active" data-filter="all">全部</button>
+          <button class="filter-btn" data-filter="brand">品牌</button>
+          <button class="filter-btn" data-filter="ui">UI/UX</button>
+          <button class="filter-btn" data-filter="visual">视觉</button>
+        </div>
+      </div>
+      <div class="work-grid" id="workGrid">
+        <div class="work-card" data-category="brand">
+          <div class="work-card-img" style="background: linear-gradient(135deg, #f43f8b 0%, #ff9a56 100%);">
+            <div class="work-card-overlay">
+              <a href="#" class="work-card-link">查看项目 →</a>
+            </div>
+            <div class="work-card-shape"></div>
+          </div>
+          <div class="work-card-info">
+            <span class="work-tag">品牌设计</span>
+            <h3>Bloom 咖啡品牌</h3>
+            <p>从零到一打造精品咖啡馆的视觉体系</p>
+          </div>
+        </div>
+        <div class="work-card work-card-large" data-category="ui">
+          <div class="work-card-img" style="background: linear-gradient(135deg, #6c63ff 0%, #3bcfff 100%);">
+            <div class="work-card-overlay">
+              <a href="#" class="work-card-link">查看项目 →</a>
+            </div>
+            <div class="work-card-shape"></div>
+          </div>
+          <div class="work-card-info">
+            <span class="work-tag">UI/UX</span>
+            <h3>健康追踪 App</h3>
+            <p>简洁直觉的健康数据可视化移动端应用</p>
+          </div>
+        </div>
+        <div class="work-card" data-category="visual">
+          <div class="work-card-img" style="background: linear-gradient(135deg, #f9c74f 0%, #f8961e 100%);">
+            <div class="work-card-overlay">
+              <a href="#" class="work-card-link">查看项目 →</a>
+            </div>
+            <div class="work-card-shape"></div>
+          </div>
+          <div class="work-card-info">
+            <span class="work-tag">视觉创意</span>
+            <h3>年度报告插画</h3>
+            <p>为科技公司定制的年度报告视觉风格</p>
+          </div>
+        </div>
+        <div class="work-card work-card-large" data-category="brand">
+          <div class="work-card-img" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+            <div class="work-card-overlay">
+              <a href="#" class="work-card-link">查看项目 →</a>
+            </div>
+            <div class="work-card-shape"></div>
+          </div>
+          <div class="work-card-info">
+            <span class="work-tag">品牌设计</span>
+            <h3>Nova 科技品牌</h3>
+            <p>面向未来的科技公司品牌视觉重塑</p>
+          </div>
+        </div>
+        <div class="work-card" data-category="ui">
+          <div class="work-card-img" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+            <div class="work-card-overlay">
+              <a href="#" class="work-card-link">查看项目 →</a>
+            </div>
+            <div class="work-card-shape"></div>
+          </div>
+          <div class="work-card-info">
+            <span class="work-tag">UI/UX</span>
+            <h3>电商平台重设计</h3>
+            <p>提升转化率的购物体验全链路设计</p>
+          </div>
+        </div>
+        <div class="work-card" data-category="visual">
+          <div class="work-card-img" style="background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);">
+            <div class="work-card-overlay">
+              <a href="#" class="work-card-link">查看项目 →</a>
+            </div>
+            <div class="work-card-shape"></div>
+          </div>
+          <div class="work-card-info">
+            <span class="work-tag">视觉创意</span>
+            <h3>音乐节视觉</h3>
+            <p>独立音乐节的海报与周边视觉设计</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills -->
+  <section class="skills section" id="skills">
+    <div class="container">
+      <div class="section-label">我的技能</div>
+      <h2 class="section-title" style="text-align:center;">工具 & 能力</h2>
+      <div class="skills-grid">
+        <div class="skill-item">
+          <div class="skill-icon" style="background:#f43f8b22; color:#f43f8b;">Fi</div>
+          <span>Figma</span>
+        </div>
+        <div class="skill-item">
+          <div class="skill-icon" style="background:#6c63ff22; color:#6c63ff;">Ai</div>
+          <span>Illustrator</span>
+        </div>
+        <div class="skill-item">
+          <div class="skill-icon" style="background:#3bcfff22; color:#3bcfff;">Ps</div>
+          <span>Photoshop</span>
+        </div>
+        <div class="skill-item">
+          <div class="skill-icon" style="background:#f9c74f22; color:#c89a00;">Ae</div>
+          <span>After Effects</span>
+        </div>
+        <div class="skill-item">
+          <div class="skill-icon" style="background:#43e97b22; color:#1aad55;">Fr</div>
+          <span>Framer</span>
+        </div>
+        <div class="skill-item">
+          <div class="skill-icon" style="background:#fa709a22; color:#c73b6a;">Pp</div>
+          <span>Premiere Pro</span>
+        </div>
+        <div class="skill-item">
+          <div class="skill-icon" style="background:#a18cd122; color:#7c5cbf;">No</div>
+          <span>Notion</span>
+        </div>
+        <div class="skill-item">
+          <div class="skill-icon" style="background:#f8961e22; color:#c96f00;">Xd</div>
+          <span>Adobe XD</span>
+        </div>
+      </div>
+
+      <div class="process-section">
+        <h3 style="text-align:center; margin-bottom:2rem; font-size:1.5rem;">我的工作流</h3>
+        <div class="process-steps">
+          <div class="process-step">
+            <div class="step-num" style="background: linear-gradient(135deg, #f43f8b, #ff9a56);">01</div>
+            <h4>发现 & 研究</h4>
+            <p>深入了解项目背景、目标用户与市场环境</p>
+          </div>
+          <div class="process-arrow">→</div>
+          <div class="process-step">
+            <div class="step-num" style="background: linear-gradient(135deg, #6c63ff, #3bcfff);">02</div>
+            <h4>概念 & 策略</h4>
+            <p>发散创意方向，确定设计策略与视觉语言</p>
+          </div>
+          <div class="process-arrow">→</div>
+          <div class="process-step">
+            <div class="step-num" style="background: linear-gradient(135deg, #f9c74f, #f8961e);">03</div>
+            <h4>设计 & 迭代</h4>
+            <p>高保真设计与持续打磨，追求完美细节</p>
+          </div>
+          <div class="process-arrow">→</div>
+          <div class="process-step">
+            <div class="step-num" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">04</div>
+            <h4>交付 & 支持</h4>
+            <p>规范化交付物，持续跟进落地效果</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="testimonials section">
+    <div class="container">
+      <div class="section-label">客户评价</div>
+      <h2 class="section-title" style="text-align:center;">他们怎么说</h2>
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <div class="quote-mark">"</div>
+          <p>非常出色的设计师！对品牌的理解非常深刻，交付的品牌视觉超出了我们的预期，团队都很喜欢。</p>
+          <div class="testimonial-author">
+            <div class="author-avatar" style="background: linear-gradient(135deg, #f43f8b, #ff9a56);">Z</div>
+            <div>
+              <strong>张先生</strong>
+              <span>Bloom 咖啡创始人</span>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="quote-mark">"</div>
+          <p>合作过最用心的设计师，不只是执行，还会主动思考产品逻辑，给出很多有价值的建议。</p>
+          <div class="testimonial-author">
+            <div class="author-avatar" style="background: linear-gradient(135deg, #6c63ff, #3bcfff);">L</div>
+            <div>
+              <strong>李女士</strong>
+              <span>科技公司产品总监</span>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="quote-mark">"</div>
+          <p>设计风格独特有创意，沟通效率很高，节省了我们大量时间，强烈推荐！</p>
+          <div class="testimonial-author">
+            <div class="author-avatar" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">W</div>
+            <div>
+              <strong>王总</strong>
+              <span>独立音乐节主办方</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section class="contact section" id="contact">
+    <div class="container">
+      <div class="contact-inner">
+        <div class="contact-text">
+          <div class="section-label">联系我</div>
+          <h2 class="section-title">有好项目？<br />来聊聊吧。</h2>
+          <p>无论是品牌设计、UI/UX 还是其他创意项目，我都很乐意听你说说想法。</p>
+          <div class="contact-links">
+            <a href="mailto:hello@example.com" class="contact-link">
+              <span class="contact-link-icon" style="background: linear-gradient(135deg, #f43f8b, #ff9a56);">@</span>
+              hello@example.com
+            </a>
+            <a href="#" class="contact-link">
+              <span class="contact-link-icon" style="background: linear-gradient(135deg, #6c63ff, #3bcfff);">in</span>
+              LinkedIn
+            </a>
+            <a href="#" class="contact-link">
+              <span class="contact-link-icon" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">Be</span>
+              Behance
+            </a>
+          </div>
+        </div>
+        <form class="contact-form" id="contactForm">
+          <div class="form-group">
+            <label for="name">你的姓名</label>
+            <input type="text" id="name" placeholder="张三" />
+          </div>
+          <div class="form-group">
+            <label for="email">邮箱地址</label>
+            <input type="email" id="email" placeholder="hello@example.com" />
+          </div>
+          <div class="form-group">
+            <label for="project">项目类型</label>
+            <select id="project">
+              <option value="">请选择...</option>
+              <option>品牌设计</option>
+              <option>UI/UX 设计</option>
+              <option>视觉创意</option>
+              <option>其他</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="message">项目描述</label>
+            <textarea id="message" rows="4" placeholder="告诉我你的想法..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">发送消息 →</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+      <a href="#" class="nav-logo">DAMON<span class="dot">.</span></a>
+        <p>© 2026 Your Name. 用心设计，每一处细节。</p>
+        <div class="footer-links">
+          <a href="#">Behance</a>
+          <a href="#">Instagram</a>
+          <a href="#">LinkedIn</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
