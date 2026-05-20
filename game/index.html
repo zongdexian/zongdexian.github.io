@@ -880,6 +880,42 @@ function spawnEnemy(typeId,x,y){
   });
 }
 
+// ---------- Boss 掉落道具 ----------
+const BOSS_DROP_POOL = [
+  {id:'hp_full',   icon:'❤️',  name:'完全治疗',  color:'#e74c3c', apply(){ player.hp=player.maxHp; }},
+  {id:'hp_up',     icon:'💗',  name:'生命强化',  color:'#fd79a8', apply(){ player.maxHp+=30; player.hp=Math.min(player.maxHp,player.hp+30); }},
+  {id:'dmg_up',    icon:'🔥',  name:'火力强化',  color:'#f39c12', apply(){ player.dmgMult*=1.25; }},
+  {id:'speed_up',  icon:'👟',  name:'急速移动',  color:'#74b9ff', apply(){ player.speedMult*=1.15; }},
+  {id:'armor',     icon:'🛡️', name:'护甲强化',  color:'#95a5a6', apply(){ player.armorPct=Math.min(.72,player.armorPct+.15); }},
+  {id:'regen',     icon:'💊',  name:'生命回复',  color:'#2ecc71', apply(){ player.hpRegen+=2; }},
+  {id:'magnet',    icon:'🧲',  name:'宝石磁铁',  color:'#a29bfe', apply(){ player.pickupRange+=70; }},
+  {id:'multishot', icon:'🌟',  name:'多重射击',  color:'#f9ca24', apply(){ player.extraShot=(player.extraShot||0)+1; }},
+];
+let bossDropItems=[];
+function spawnBossDrop(x, y){
+  if(Math.random() < 0.5) return; // 50%概率不掉落
+  const item = BOSS_DROP_POOL[rngI(0, BOSS_DROP_POOL.length-1)];
+  bossDropItems.push({ x, y, item, r:10, bobTime:rng(0,TAU), alive:true });
+}
+function updateBossDropItems(delta){
+  for(let i=bossDropItems.length-1; i>=0; i--){
+    const d=bossDropItems[i];
+    d.bobTime+=delta*2;
+    const dd=dist(player,d);
+    if(dd<player.pickupRange+d.r){
+      const ang=Math.atan2(player.y-d.y,player.x-d.x);
+      d.x+=Math.cos(ang)*280*delta; d.y+=Math.sin(ang)*280*delta;
+    }
+    if(dist(player,d)<player.r+d.r){
+      d.item.apply();
+      spawnParticles(d.x,d.y,d.item.color,16,150,0.6);
+      spawnDmgText(d.x,d.y-20,d.item.name,d.item.color);
+      bossDropItems.splice(i,1);
+      updateHUD();
+    }
+  }
+}
+
 let gems=[];
 function spawnGem(x,y,xp){
   if(gems.length>=MAX_GEMS) return;
@@ -926,7 +962,7 @@ function syncOrbitalSatellites(){
       angle:        baseAngle + (TAU / totalCount) * i,
       orbitR:       totalR,
       angSpeed:     2.0,
-      r:            4,
+      r:            2 + (wInst.level * 0.5), // Lv1=2.5, Lv6=5, Lv12=8
       damage:       totalDmg,
       flashTimer:   0,
       hitCooldowns: {},
@@ -1314,7 +1350,7 @@ function dealDmg(e,dmg){
     spawnGem(e.x,e.y,e.xp);
     if(e.isBoss){
       bossesDefeated++;
-      // 退出竞技场
+      spawnBossDrop(e.x, e.y); // 50%概率掉落随机道具
       if(arena.bossUid===e.uid){
         arena.active=false;
         arena.bossUid=-1;
@@ -1578,6 +1614,31 @@ function render(){
     ctx.fillStyle=g.color; ctx.fill(); ctx.strokeStyle='#fff5'; ctx.lineWidth=1; ctx.stroke();
     ctx.restore();
   });
+  // boss drop items
+  bossDropItems.forEach(d=>{
+    if(d.x<vx0||d.x>vx1||d.y<vy0||d.y>vy1) return;
+    const bob=Math.sin(d.bobTime)*3;
+    ctx.save(); ctx.translate(d.x, d.y+bob);
+    // 外层脉冲光圈
+    const pulse=0.6+Math.sin(d.bobTime*2)*0.4;
+    const gl=ctx.createRadialGradient(0,0,0,0,0,d.r*2.8*pulse);
+    gl.addColorStop(0,d.item.color+'66'); gl.addColorStop(1,'transparent');
+    ctx.beginPath(); ctx.arc(0,0,d.r*2.8*pulse,0,TAU); ctx.fillStyle=gl; ctx.fill();
+    // 主体六边形
+    ctx.beginPath();
+    for(let i=0;i<6;i++){
+      const a=TAU/6*i-Math.PI/6;
+      i===0?ctx.moveTo(Math.cos(a)*d.r,Math.sin(a)*d.r):ctx.lineTo(Math.cos(a)*d.r,Math.sin(a)*d.r);
+    }
+    ctx.closePath();
+    ctx.fillStyle=d.item.color; ctx.fill();
+    ctx.strokeStyle='#fff8'; ctx.lineWidth=1.5; ctx.stroke();
+    // 图标文字
+    ctx.font=`${d.r}px serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(d.item.icon,0,0.5);
+    ctx.restore();
+  });
+
   // particles
   particles.forEach(p=>{
     const t=p.life/p.maxLife, al=Math.floor(t*255).toString(16).padStart(2,'0');
@@ -1699,7 +1760,7 @@ function gameLoop(ts){
     updatePlayer(dt); updateWeapons(dt); updateBullets(dt);
     updateOrbitalSatellites(dt);
     updateEnemies(dt); updateGems(dt); updateFragPickups(dt);
-    updateParticles(dt); updateShockwaves(dt); updateArena(dt); updateSpawner(dt);
+    updateParticles(dt); updateShockwaves(dt); updateArena(dt); updateBossDropItems(dt); updateSpawner(dt);
     updateHUD();
     if(gameTime>=MISSION_DURATION){endRun(true);return;}
   }
@@ -1748,7 +1809,7 @@ function startGame(){
   document.getElementById('levelupScreen').style.display='none';
   gameTime=0;dt=0;lastTs=0; killCount=0;totalDmgDealt=0;runFragments=0;runBlueprints=[];
   wave=1;waveTimer=0;spawnTimer=1; bossesDefeated=0;
-  bullets=[];enemies=[];gems=[];particles=[];shockwaves=[];fragPickups=[];orbitalSatellites=[];
+  bullets=[];enemies=[];gems=[];particles=[];shockwaves=[];fragPickups=[];orbitalSatellites=[];bossDropItems=[];
   arena.active=false; arena.r=0; arena.bossUid=-1;
   levelUpQueue=0;levelUpActive=false;_uid=0; gState='play';
   releaseJoystick();
