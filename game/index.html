@@ -198,6 +198,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0a0f;font-family:
   padding:max(44px, calc(env(safe-area-inset-top) + 12px)) 14px 8px;
   background:linear-gradient(to bottom,rgba(0,0,0,.85) 60%,transparent);
   display:flex;align-items:flex-start;gap:10px;
+  pointer-events:none;
+  z-index:2;
 }
 .hud-bars{flex:1;display:flex;flex-direction:column;gap:5px;}
 .bar-row{display:flex;align-items:center;gap:6px;}
@@ -242,6 +244,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0a0f;font-family:
   display:flex;justify-content:center;gap:6px;
   padding:0 14px;
   pointer-events:none;
+  z-index:2;
 }
 .weapon-slot{
   width:50px;height:54px;background:rgba(10,10,20,.8);
@@ -253,10 +256,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0a0f;font-family:
 .weapon-slot span{font-size:8px;color:#ccc;margin-top:1px;}
 .weapon-lvl{position:absolute;top:2px;right:3px;font-size:8px;color:#f9ca24;font-weight:bold;}
 
-/* Virtual joystick area — 扩展到整个游戏屏幕 */
+/* Virtual joystick area — 全屏底层，永远在最下面接收触摸 */
 #joystickArea{
   position:absolute;inset:0;
   pointer-events:all;
+  z-index:0;
 }
 #joystickBase{
   position:absolute;
@@ -370,10 +374,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0a0f;font-family:
   position:absolute;
   top:max(46px, calc(env(safe-area-inset-top) + 14px));
   right:14px;
-  width:40px;height:40px;
-  background:rgba(0,0,0,.6);border:1px solid #444;border-radius:10px;
+  width:44px;height:44px;
+  background:rgba(0,0,0,.65);border:1px solid #555;border-radius:10px;
   display:flex;align-items:center;justify-content:center;
-  font-size:18px;cursor:pointer;pointer-events:all;z-index:10;
+  font-size:18px;cursor:pointer;pointer-events:all;z-index:20;
   transition:background .15s;
 }
 #pauseBtn:active{background:rgba(255,255,255,.1);}
@@ -1100,58 +1104,63 @@ function getTouchPos(touch){
   return{x:(touch.clientX-rect.left)*scaleX, y:(touch.clientY-rect.top)*scaleY};
 }
 
-document.getElementById('joystickArea').addEventListener('touchstart',e=>{
+// ── 摇杆事件绑定到整个游戏UI层，全屏任意位置触控 ──
+const _gameUI = document.getElementById('gameUI');
+
+_gameUI.addEventListener('touchstart', e=>{
+  // 只在游戏进行中响应
+  if(gState !== 'play') return;
   e.preventDefault();
   for(const touch of e.changedTouches){
     if(joystick.active) continue;
-    const pos=getTouchPos(touch);
-    // 排除顶部 HUD 区域（避免误触 HP条/暂停按钮）
-    // 顶部约 130px 为 HUD 区域
-    if(pos.y < 130) continue;
-    joystick.active=true;
-    joystick.touchId=touch.identifier;
-    joystick.bx=pos.x; joystick.by=pos.y;
-    joystick.dx=0; joystick.dy=0; joystick.magnitude=0;
-    // 显示摇杆底盘在触摸位置
-    const base=document.getElementById('joystickBase');
-    const rect2=canvas.getBoundingClientRect();
-    const cx=(pos.x/CW)*rect2.width+rect2.left;
-    const cy=(pos.y/CH)*rect2.height+rect2.top;
-    base.style.left=cx+'px'; base.style.top=cy+'px'; base.style.display='block';
-    document.getElementById('joystickKnob').style.left='50%';
-    document.getElementById('joystickKnob').style.top='50%';
+    // 排除暂停按钮区域（右上角 60×60px）
+    const rect2 = canvas.getBoundingClientRect();
+    const px = (touch.clientX - rect2.left) / rect2.width * CW;
+    const py = (touch.clientY - rect2.top)  / rect2.height * CH;
+    if(px > CW-70 && py < 120) continue; // 暂停按钮区域跳过
+    joystick.active   = true;
+    joystick.touchId  = touch.identifier;
+    joystick.bx = px; joystick.by = py;
+    joystick.dx = 0;  joystick.dy = 0; joystick.magnitude = 0;
+    // 摇杆底盘出现在触摸位置
+    const base = document.getElementById('joystickBase');
+    const cx   = touch.clientX;
+    const cy   = touch.clientY;
+    base.style.left = cx+'px'; base.style.top = cy+'px';
+    base.style.display = 'block';
+    document.getElementById('joystickKnob').style.left = '50%';
+    document.getElementById('joystickKnob').style.top  = '50%';
   }
 },{passive:false});
 
-document.getElementById('joystickArea').addEventListener('touchmove',e=>{
+_gameUI.addEventListener('touchmove', e=>{
+  if(gState !== 'play') return;
   e.preventDefault();
   for(const touch of e.changedTouches){
-    if(touch.identifier!==joystick.touchId) continue;
-    const pos=getTouchPos(touch);
-    let dx=pos.x-joystick.bx, dy=pos.y-joystick.by;
-    const mag=Math.hypot(dx,dy);
-    if(mag>joystick.maxR){dx=dx/mag*joystick.maxR;dy=dy/mag*joystick.maxR;}
-    joystick.dx=dx/joystick.maxR; joystick.dy=dy/joystick.maxR;
-    joystick.magnitude=Math.min(1,mag/joystick.maxR);
-    // move knob visually
-    const knob=document.getElementById('joystickKnob');
-    const rect2=canvas.getBoundingClientRect();
-    const kx=((joystick.bx+dx)/CW)*rect2.width+rect2.left;
-    const ky=((joystick.by+dy)/CH)*rect2.height+rect2.top;
-    const bx2=((joystick.bx)/CW)*rect2.width+rect2.left;
-    const by2=((joystick.by)/CH)*rect2.height+rect2.top;
-    knob.style.left=50+(dx/110*100)+'%';
-    knob.style.top =50+(dy/110*100)+'%';
+    if(touch.identifier !== joystick.touchId) continue;
+    const rect2 = canvas.getBoundingClientRect();
+    const px = (touch.clientX - rect2.left) / rect2.width * CW;
+    const py = (touch.clientY - rect2.top)  / rect2.height * CH;
+    let dx = px - joystick.bx, dy = py - joystick.by;
+    const mag = Math.hypot(dx, dy);
+    if(mag > joystick.maxR){ dx = dx/mag*joystick.maxR; dy = dy/mag*joystick.maxR; }
+    joystick.dx        = dx / joystick.maxR;
+    joystick.dy        = dy / joystick.maxR;
+    joystick.magnitude = Math.min(1, mag / joystick.maxR);
+    // 更新摇杆视觉
+    const knob = document.getElementById('joystickKnob');
+    knob.style.left = 50 + (dx / 110 * 100) + '%';
+    knob.style.top  = 50 + (dy / 110 * 100) + '%';
   }
 },{passive:false});
 
 function releaseJoystick(){
-  joystick.active=false; joystick.touchId=null;
-  joystick.dx=0; joystick.dy=0; joystick.magnitude=0;
-  document.getElementById('joystickBase').style.display='none';
+  joystick.active = false; joystick.touchId = null;
+  joystick.dx = 0; joystick.dy = 0; joystick.magnitude = 0;
+  document.getElementById('joystickBase').style.display = 'none';
 }
-document.getElementById('joystickArea').addEventListener('touchend',  e=>{e.preventDefault();for(const t of e.changedTouches) if(t.identifier===joystick.touchId) releaseJoystick();},{passive:false});
-document.getElementById('joystickArea').addEventListener('touchcancel',e=>{e.preventDefault();releaseJoystick();},{passive:false});
+_gameUI.addEventListener('touchend',    e=>{ e.preventDefault(); for(const t of e.changedTouches) if(t.identifier===joystick.touchId) releaseJoystick(); },{passive:false});
+_gameUI.addEventListener('touchcancel', e=>{ e.preventDefault(); releaseJoystick(); },{passive:false});
 
 // decorations
 const decorations=[];
