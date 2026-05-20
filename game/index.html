@@ -861,12 +861,12 @@ function spawnBullet(x,y,angle,def,owner,wi,overrideR){
 }
 
 const ENEMY_TYPES={
-  grunt:  {typeId:'grunt',  r:5, hp:30,  speed:36, color:'#e74c3c',c2:'#c0392b',xp:4, dmg:8, isMelee:true, fragDrop:1},
-  fast:   {typeId:'fast',   r:4, hp:18,  speed:72, color:'#a29bfe',c2:'#6c5ce7',xp:3, dmg:6, isMelee:true, fragDrop:1},
-  tank:   {typeId:'tank',   r:9, hp:180, speed:21, color:'#636e72',c2:'#2d3436',xp:15,dmg:20,isMelee:true, fragDrop:4},
-  shooter:{typeId:'shooter',r:5, hp:50,  speed:25, color:'#fdcb6e',c2:'#e17055',xp:8, dmg:12,isMelee:false,shootRate:0.55,fragDrop:3},
-  elite:  {typeId:'elite',  r:11,hp:400, speed:40, color:'#e17055',c2:'#d63031',xp:40,dmg:25,isMelee:true, fragDrop:8},
-  boss:   {typeId:'boss',   r:16,hp:1500,speed:27, color:'#fd79a8',c2:'#e84393',xp:150,dmg:35,isMelee:false,shootRate:0.9,isBoss:true,fragDrop:30},
+  grunt:  {typeId:'grunt',  r:5, hp:30,  speed:36, color:'#e74c3c',c2:'#c0392b',xp:4, dmg:8, isMelee:true, fragDrop:0},
+  fast:   {typeId:'fast',   r:4, hp:18,  speed:72, color:'#a29bfe',c2:'#6c5ce7',xp:3, dmg:6, isMelee:true, fragDrop:0},
+  tank:   {typeId:'tank',   r:9, hp:180, speed:21, color:'#636e72',c2:'#2d3436',xp:15,dmg:20,isMelee:true, fragDrop:1},
+  shooter:{typeId:'shooter',r:5, hp:50,  speed:25, color:'#fdcb6e',c2:'#e17055',xp:8, dmg:12,isMelee:false,shootRate:0.55,fragDrop:1},
+  elite:  {typeId:'elite',  r:11,hp:400, speed:40, color:'#e17055',c2:'#d63031',xp:40,dmg:25,isMelee:true, fragDrop:3},
+  boss:   {typeId:'boss',   r:16,hp:1500,speed:27, color:'#fd79a8',c2:'#e84393',xp:150,dmg:35,isMelee:false,shootRate:0.9,isBoss:true,fragDrop:15},
 };
 let enemies=[], _uid=0;
 function getDiffScale(t){
@@ -1404,10 +1404,12 @@ function dealDmg(e,dmg){
       }
     }
     const fd=e.fragDrop+(currentMission==='hard'?rngI(1,3):currentMission==='boss'?rngI(3,8):0);
-    // 碎片：与经验宝石相反方向偏移
-    const fragAngle = gemAngle + Math.PI + rng(-0.5, 0.5);
-    const fragDist  = rng(14, 24);
-    spawnFragPickup(e.x + Math.cos(fragAngle)*fragDist, e.y + Math.sin(fragAngle)*fragDist, fd);
+    // 碎片：fragDrop>0才生成，与经验宝石相反方向偏移
+    if(fd > 0){
+      const fragAngle = gemAngle + Math.PI + rng(-0.5, 0.5);
+      const fragDist  = rng(14, 24);
+      spawnFragPickup(e.x + Math.cos(fragAngle)*fragDist, e.y + Math.sin(fragAngle)*fragDist, fd);
+    }
     // 图纸：垂直方向偏移
     const bpChance=e.isBoss?.8:e.typeId==='elite'?.15:e.typeId==='tank'?.03:e.typeId==='shooter'?.02:.005;
     if(Math.random()<bpChance){
