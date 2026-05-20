@@ -920,6 +920,7 @@ function updateBossDropItems(delta){
     }
     if(dist(player,d)<player.r+d.r){
       d.item.apply();
+      Audio.pickup();
       spawnParticles(d.x,d.y,d.item.color,16,150,0.6);
       spawnDmgText(d.x,d.y-20,d.item.name,d.item.color);
       bossDropItems.splice(i,1);
@@ -958,6 +959,7 @@ function updateBlueprintPickups(delta){
     }
     if(dist(player,b)<player.r+b.r){
       runBlueprints.push(b.bpId);
+      Audio.pickup();
       document.getElementById('irBlueprints').textContent=runBlueprints.length;
       spawnParticles(b.x,b.y,b.color,12,120,0.5);
       spawnDmgText(b.x,b.y-20,b.def.name,b.color);
@@ -1325,6 +1327,7 @@ function updateWeapons(delta){
     const extra=player.extraShot||0;
     const bonusCount=w.bonusCount||0;
 
+    Audio.shoot(def.id);
     if(def.shotgunSpread){
       // 霰弹：基础count + bonusCount + extraShot，弹体也随升级变大
       const tc = def.count + bonusCount + extra;
@@ -1385,10 +1388,12 @@ function dealDmg(e,dmg){
   spawnParticles(e.x,e.y,e.color,4,60,.28);
   if(e.hp<=0){
     e.alive=false; killCount++; save.totalKills++;
+    Audio.kill();
     spawnGem(e.x,e.y,e.xp);
     if(e.isBoss){
       bossesDefeated++;
-      spawnBossDrop(e.x, e.y); // 50%概率掉落随机道具
+      Audio.bossKill();
+      spawnBossDrop(e.x, e.y);
       if(arena.bossUid===e.uid){
         arena.active=false;
         arena.bossUid=-1;
@@ -1405,6 +1410,7 @@ function dealDmg(e,dmg){
 
 function hurtPlayer(dmg){
   const a=dmg*(1-player.armorPct); player.hp-=a; player.invincible=.15;
+  Audio.playerHurt();
   spawnParticles(player.x,player.y,'#e74c3c',7,110,.38);
   cam.x+=rng(-4,4); cam.y+=rng(-4,4);
   if(player.hp<=0){player.hp=0;endRun(false);}
@@ -1464,7 +1470,12 @@ function updateFragPickups(delta){
     const f=fragPickups[i]; f.bobTime+=delta*2;
     const d=dist(player,f);
     if(d<player.pickupRange+f.r){const ang=Math.atan2(player.y-f.y,player.x-f.x);f.x+=Math.cos(ang)*320*delta;f.y+=Math.sin(ang)*320*delta;}
-    if(dist(player,f)<player.r+f.r){fragPickups.splice(i,1);runFragments+=f.amount;document.getElementById('irFragments').textContent=runFragments;}
+    if(dist(player,f)<player.r+f.r){
+      Audio.pickup();
+      fragPickups.splice(i,1);
+      runFragments+=f.amount;
+      document.getElementById('irFragments').textContent=runFragments;
+    }
   }
 }
 
@@ -1479,6 +1490,7 @@ function gainXP(xp){
 function showNextLevelUp(){
   if(levelUpQueue<=0){levelUpActive=false;return;}
   levelUpActive=true; levelUpQueue--; gState='levelup';
+  Audio.levelUp();
   document.getElementById('levelupQueue').textContent=levelUpQueue>0?`还有 ${levelUpQueue} 次待选择`:'';
   const cards=pickUpgrades(3), row=document.getElementById('cardsRow');
   row.innerHTML='';
@@ -1550,6 +1562,7 @@ function updateSpawner(delta){
     // 每10波出BOSS
     if(BOSS_WAVES.includes(wave)){
       spawnBoss();
+      Audio.bossAppear();
     }
     showWaveAnnounce(wave);
   }
@@ -1855,6 +1868,7 @@ function togglePause(){
   if(gState==='results'||gState==='levelup') return;
   if(gState==='play'){
     gState='pause';
+    Audio.pauseBGM();
     document.getElementById('pauseBtn').textContent='▶️';
     // fill pause stats
     document.getElementById('pauseWave').textContent  = wave+' / '+MAX_WAVES;
@@ -1865,9 +1879,10 @@ function togglePause(){
     document.getElementById('pauseScreen').style.display='flex';
   } else if(gState==='pause'){
     gState='play';
+    Audio.resumeBGM();
     document.getElementById('pauseBtn').textContent='⏸';
     document.getElementById('pauseScreen').style.display='none';
-    lastTs=0; // 防止暂停后 dt 异常大
+    lastTs=0;
     animFrame=requestAnimationFrame(gameLoop);
   }
 }
@@ -1881,6 +1896,7 @@ function startMission(type){
 }
 
 function startGame(){
+  Audio.stopBGM();
   document.getElementById('resultsScreen').style.display='none';
   document.getElementById('levelupScreen').style.display='none';
   gameTime=0;dt=0;lastTs=0; killCount=0;totalDmgDealt=0;runFragments=0;runBlueprints=[];
@@ -1912,6 +1928,7 @@ function startGame(){
   document.getElementById('irFragments').textContent=0;
   document.getElementById('irBlueprints').textContent=0;
   showWaveAnnounce(1);
+  Audio.startBGM();
   if(animFrame) cancelAnimationFrame(animFrame);
   lastTs=0;
   animFrame=requestAnimationFrame(gameLoop);
@@ -1919,6 +1936,8 @@ function startGame(){
 
 function endRun(completed){
   gState='results'; cancelAnimationFrame(animFrame);
+  Audio.stopBGM();
+  if(completed) Audio.victory(); else Audio.gameOver();
   const s=Math.floor(gameTime);
   const timeStr=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
   const rt=document.getElementById('resultTitle');
@@ -1954,7 +1973,262 @@ function extractAndReturn(){
 }
 function abandonAndReturn(){ writeSave(); returnToLobby(); }
 
+// ============================================================
+//  AUDIO ENGINE — Web Audio API 合成音乐+音效
+// ============================================================
+const Audio = (() => {
+  let ctx = null;
+  let masterGain = null;
+  let bgmNode = null;      // 背景音乐调度器
+  let bgmRunning = false;
+  let beatCount = 0;
+  let nextBeatTime = 0;
+  const BPM = 138;         // 节拍速度，电子游戏风格
+  const BEAT = 60 / BPM;  // 每拍秒数
+
+  function init() {
+    if (ctx) return;
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = ctx.createGain();
+    masterGain.gain.value = 0.55;
+    masterGain.connect(ctx.destination);
+  }
+
+  // ── 基础合成器 ──
+  function playOsc(freq, type, startT, dur, vol=0.3, detune=0) {
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(freq, startT);
+    o.detune.value = detune;
+    g.gain.setValueAtTime(0, startT);
+    g.gain.linearRampToValueAtTime(vol, startT + 0.005);
+    g.gain.exponentialRampToValueAtTime(0.001, startT + dur);
+    o.connect(g); g.connect(masterGain);
+    o.start(startT); o.stop(startT + dur + 0.01);
+  }
+
+  // 噪声发生器（鼓用）
+  function playNoise(startT, dur, vol=0.4, hpFreq=800) {
+    const buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const hp = ctx.createBiquadFilter();
+    hp.type = 'highpass'; hp.frequency.value = hpFreq;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(vol, startT);
+    g.gain.exponentialRampToValueAtTime(0.001, startT + dur);
+    src.connect(hp); hp.connect(g); g.connect(masterGain);
+    src.start(startT); src.stop(startT + dur + 0.01);
+  }
+
+  // ── 鼓组 ──
+  function kick(t) {
+    // 低频正弦+快速下扫
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(160, t);
+    o.frequency.exponentialRampToValueAtTime(40, t + 0.12);
+    g.gain.setValueAtTime(0.9, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+    o.connect(g); g.connect(masterGain);
+    o.start(t); o.stop(t + 0.35);
+  }
+
+  function snare(t) {
+    // 噪声+短调
+    playNoise(t, 0.18, 0.45, 1200);
+    playOsc(220, 'triangle', t, 0.12, 0.2);
+  }
+
+  function hihat(t, vol=0.25) {
+    playNoise(t, 0.06, vol, 8000);
+  }
+
+  function openhat(t) {
+    playNoise(t, 0.22, 0.2, 6000);
+  }
+
+  // ── 贝斯音符 ──
+  const bassNotes = [55, 55, 73.4, 55, 65.4, 55, 49, 55]; // A1变奏
+  function bass(t, noteIdx, dur=BEAT*0.45) {
+    const freq = bassNotes[noteIdx % bassNotes.length];
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    const dist = ctx.createWaveShaper();
+    // 轻微失真
+    const curve = new Float32Array(256);
+    for(let i=0;i<256;i++){const x=i*2/256-1;curve[i]=x*(Math.abs(x)+0.3)/(Math.abs(x)*1.3+0.3);}
+    dist.curve = curve;
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(freq, t);
+    g.gain.setValueAtTime(0.4, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.connect(dist); dist.connect(g); g.connect(masterGain);
+    o.start(t); o.stop(t + dur + 0.01);
+  }
+
+  // ── 合成铅音（旋律）──
+  const melody = [880,880,1046,880,784,0,880,0,  784,784,880,784,659,0,784,0];
+  let melodyIdx = 0;
+  function lead(t, idx, dur=BEAT*0.38) {
+    const freq = melody[idx % melody.length];
+    if(!freq) return;
+    playOsc(freq, 'square', t, dur, 0.08, 5);
+    playOsc(freq*2, 'sine', t, dur*0.5, 0.04);
+  }
+
+  // ── BGM 节拍调度器 ──
+  // 节拍模式：16步 (每步=1/4拍 = 1/4*BEAT)
+  // K=Kick S=Snare H=Hihat O=Openhat .=空
+  // K . H . S . H . K . H O S . H .
+  const drumPattern = [
+  // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
+    'K','.',  'H','.', 'S','.','H','.','K','H','.','O','S','.','H','H'
+  ];
+  const bassPattern  = [1,0,0,0, 0,0,1,0, 1,0,0,0, 0,1,0,0];
+  const leadPattern  = [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0];
+
+  const STEP = BEAT / 4; // 16分音符
+
+  function scheduleBeat() {
+    const lookAhead = 0.12;
+    while (nextBeatTime < ctx.currentTime + lookAhead) {
+      const step = beatCount % 16;
+      const t = nextBeatTime;
+
+      // 鼓
+      const dp = drumPattern[step];
+      if(dp==='K') kick(t);
+      else if(dp==='S') snare(t);
+      else if(dp==='H') hihat(t);
+      else if(dp==='O') openhat(t);
+
+      // 贝斯（每小节变化）
+      if(bassPattern[step]) bass(t, Math.floor(beatCount/16));
+
+      // 旋律（每2小节出现一次）
+      const bar = Math.floor(beatCount / 16);
+      if(leadPattern[step] && bar % 2 === 1) lead(t, melodyIdx++);
+
+      nextBeatTime += STEP;
+      beatCount++;
+    }
+    bgmNode = setTimeout(scheduleBeat, 40);
+  }
+
+  // ── 公开 API ──
+  return {
+    init,
+    startBGM() {
+      init();
+      if(bgmRunning) return;
+      bgmRunning = true;
+      beatCount = 0;
+      melodyIdx = 0;
+      nextBeatTime = ctx.currentTime + 0.05;
+      scheduleBeat();
+    },
+    stopBGM() {
+      bgmRunning = false;
+      if(bgmNode) clearTimeout(bgmNode);
+    },
+    pauseBGM() {
+      if(ctx) ctx.suspend();
+    },
+    resumeBGM() {
+      if(ctx) ctx.resume();
+    },
+
+    // ── 音效 ──
+    shoot(weapId) {
+      if(!ctx) return;
+      const t = ctx.currentTime;
+      if(weapId==='pistol')  { playOsc(880,  'square',   t, 0.06, 0.18); playNoise(t, 0.04, 0.1, 4000); }
+      else if(weapId==='shotgun') {
+        for(let i=0;i<3;i++) setTimeout(()=>{ playNoise(ctx.currentTime, 0.08, 0.25, 2000+i*500); }, i*15);
+      }
+      else if(weapId==='grenade') { playOsc(120, 'sawtooth', t, 0.15, 0.3); playNoise(t, 0.08, 0.2, 300); }
+      else if(weapId==='laser')   { playOsc(2400,'sine',  t, 0.08, 0.15); playOsc(1800,'sine',t+0.02,0.05,0.1); }
+      else if(weapId==='orbital') { playOsc(660, 'triangle', t, 0.05, 0.12); }
+      else { playOsc(660, 'square', t, 0.05, 0.15); }
+    },
+
+    hit() {
+      if(!ctx) return;
+      const t = ctx.currentTime;
+      playNoise(t, 0.06, 0.3, 500);
+      playOsc(180, 'sine', t, 0.06, 0.2);
+    },
+
+    kill() {
+      if(!ctx) return;
+      const t = ctx.currentTime;
+      playOsc(440, 'square', t,       0.04, 0.2);
+      playOsc(550, 'square', t+0.04,  0.04, 0.18);
+      playNoise(t, 0.08, 0.22, 3000);
+    },
+
+    bossAppear() {
+      if(!ctx) return;
+      const t = ctx.currentTime;
+      // 警报上升
+      for(let i=0;i<4;i++){
+        playOsc(110*(i+1), 'sawtooth', t+i*0.12, 0.1, 0.35);
+        kick(t+i*0.12);
+      }
+      playNoise(t, 0.5, 0.4, 200);
+    },
+
+    playerHurt() {
+      if(!ctx) return;
+      const t = ctx.currentTime;
+      playOsc(220, 'sawtooth', t, 0.12, 0.35);
+      playNoise(t, 0.1, 0.3, 200);
+    },
+
+    levelUp() {
+      if(!ctx) return;
+      const t = ctx.currentTime;
+      [523,659,784,1046].forEach((f,i)=> playOsc(f,'sine',t+i*0.07,0.15,0.22));
+    },
+
+    pickup() {
+      if(!ctx) return;
+      const t = ctx.currentTime;
+      playOsc(1200, 'sine', t,      0.06, 0.18);
+      playOsc(1600, 'sine', t+0.05, 0.06, 0.15);
+    },
+
+    bossKill() {
+      if(!ctx) return;
+      const t = ctx.currentTime;
+      [220,330,440,550,660,880].forEach((f,i)=> playOsc(f,'square',t+i*0.06,0.12,0.25));
+      for(let i=0;i<3;i++) kick(t+i*0.1);
+    },
+
+    gameOver() {
+      if(!ctx) return;
+      const t = ctx.currentTime;
+      [440,330,220,165].forEach((f,i)=> playOsc(f,'sawtooth',t+i*0.15,0.2,0.3));
+    },
+
+    victory() {
+      if(!ctx) return;
+      const t = ctx.currentTime;
+      [523,659,784,1046,1318].forEach((f,i)=> playOsc(f,'sine',t+i*0.1,0.25,0.3));
+      [262,330,392,523].forEach((f,i)=> playOsc(f,'triangle',t+i*0.1+0.05,0.2,0.2));
+    },
+  };
+})();
+
 // ── INIT ──
+// 手机端：首次触摸时初始化 AudioContext
+document.addEventListener('touchstart', ()=>Audio.init(), {once:true});
+document.addEventListener('click',      ()=>Audio.init(), {once:true});
 renderLobby();
 </script>
 </body>
