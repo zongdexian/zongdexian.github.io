@@ -162,6 +162,111 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0a0f;font-family:
 .btn-upg:disabled{background:#2a2a2a;color:#555;}
 .upg-cost{font-size:9px;color:#f9ca24;text-align:center;margin-top:3px;}
 
+/* ── 角色 Tab ── */
+.char-layout{display:flex;flex-direction:column;gap:14px;}
+/* 装备人形图 */
+.char-mannequin{
+  background:linear-gradient(135deg,#1a1a2e,#16213e);
+  border:1px solid #2a2a4e;border-radius:14px;
+  padding:14px;position:relative;
+}
+.char-title{font-size:13px;font-weight:bold;color:#f9ca24;margin-bottom:12px;text-align:center;}
+.mannequin-grid{
+  display:grid;
+  grid-template-columns:56px 80px 56px;
+  grid-template-rows:repeat(4,52px);
+  gap:6px;justify-content:center;align-items:center;
+}
+.equip-slot{
+  width:52px;height:48px;
+  background:rgba(0,0,0,.4);border:1.5px dashed #333;border-radius:8px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;position:relative;transition:border-color .15s;
+}
+.equip-slot:active{border-color:#f9ca24;}
+.equip-slot.filled{border-style:solid;border-color:#555;}
+.equip-slot.filled.rarity-common{border-color:#95a5a6;}
+.equip-slot.filled.rarity-rare  {border-color:#3498db;box-shadow:0 0 6px #3498db44;}
+.equip-slot.filled.rarity-epic  {border-color:#9b59b6;box-shadow:0 0 6px #9b59b644;}
+.equip-slot.filled.rarity-legend{border-color:#f9ca24;box-shadow:0 0 8px #f9ca2455;}
+.equip-slot-ico{font-size:20px;line-height:1;}
+.equip-slot-lbl{font-size:8px;color:#888;margin-top:2px;}
+.equip-slot-name{font-size:7px;color:#ccc;margin-top:1px;text-align:center;max-width:50px;white-space:nowrap;overflow:hidden;}
+.char-center{display:flex;align-items:center;justify-content:center;}
+.char-avatar-big{font-size:52px;line-height:1;}
+/* 装备属性总览 */
+.equip-stats-bar{
+  display:grid;grid-template-columns:1fr 1fr;gap:6px;
+  background:#111;border:1px solid #1a1a1a;border-radius:10px;padding:10px 12px;
+}
+.equip-stat-item{display:flex;align-items:center;gap:6px;font-size:11px;}
+.equip-stat-ico{font-size:14px;}
+.equip-stat-val{color:#55efc4;font-weight:bold;}
+/* 背包 */
+.inventory-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.inv-title{font-size:13px;font-weight:bold;color:#f9ca24;}
+.inv-count{font-size:10px;color:#888;}
+.inventory-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:320px;overflow-y:auto;}
+.inv-item{
+  background:#111;border:1.5px solid #222;border-radius:10px;
+  padding:10px 6px;text-align:center;cursor:pointer;
+  transition:border-color .15s,transform .1s;position:relative;
+}
+.inv-item:active{transform:scale(.96);}
+.inv-item.rarity-common{border-color:#95a5a6;}
+.inv-item.rarity-rare  {border-color:#3498db;}
+.inv-item.rarity-epic  {border-color:#9b59b6;}
+.inv-item.rarity-legend{border-color:#f9ca24;}
+.inv-item.equipped{opacity:.5;}
+.inv-ico{font-size:26px;margin-bottom:4px;}
+.inv-name{font-size:9px;font-weight:bold;color:#ddd;line-height:1.3;}
+.inv-rar{font-size:8px;margin-top:2px;}
+.inv-stat{font-size:9px;color:#55efc4;margin-top:3px;}
+.inv-equip-badge{
+  position:absolute;top:3px;right:4px;
+  font-size:7px;background:#f9ca24;color:#111;
+  border-radius:4px;padding:1px 3px;font-weight:bold;
+}
+/* 装备详情弹窗 */
+#equipModal{
+  position:absolute;inset:0;background:rgba(0,0,0,.88);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  z-index:50;padding:20px;pointer-events:all;
+}
+.modal-card{
+  width:100%;max-width:300px;
+  background:linear-gradient(135deg,#1a1a2e,#16213e);
+  border-radius:16px;padding:20px;
+}
+.modal-ico{font-size:48px;text-align:center;margin-bottom:8px;}
+.modal-name{font-size:16px;font-weight:bold;text-align:center;margin-bottom:4px;}
+.modal-rar{font-size:11px;text-align:center;margin-bottom:12px;}
+.modal-stat{
+  background:#111;border-radius:8px;padding:10px 14px;
+  font-size:13px;margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+.modal-btns{display:flex;gap:8px;}
+.btn-equip{
+  flex:1;padding:12px;background:linear-gradient(135deg,#f9ca24,#f0932b);
+  color:#111;font-weight:bold;font-size:14px;
+  border:none;border-radius:10px;cursor:pointer;
+}
+.btn-unequip{
+  flex:1;padding:12px;background:linear-gradient(135deg,#636e72,#b2bec3);
+  color:#111;font-weight:bold;font-size:14px;
+  border:none;border-radius:10px;cursor:pointer;
+}
+.btn-discard{
+  padding:12px 16px;background:#2d2d2d;border:1px solid #444;
+  color:#e17055;font-size:13px;border-radius:10px;cursor:pointer;
+}
+.btn-close-modal{
+  width:100%;margin-top:8px;padding:10px;
+  background:transparent;border:1px solid #333;
+  color:#888;font-size:13px;border-radius:10px;cursor:pointer;
+}
+
 /* ── 图纸 Tab ── */
 .bp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
 .bp-card{
@@ -439,33 +544,89 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0a0f;font-family:
         <div class="mission-card" id="mc-normal" ontouchend="startMission('normal')" onclick="startMission('normal')">
           <div class="mc-icon-big">🌿</div>
           <div class="mc-info">
-            <div class="mc-name">普通战区</div>
-            <div class="mc-time">⏱ 15分钟</div>
-            <div class="mc-reward">🔩碎片×20~50 &nbsp;📋图纸×0~2</div>
+            <div class="mc-name">绿野战区</div>
+            <div class="mc-time">⏱ 15分钟 · 普通难度</div>
+            <div class="mc-reward">🔩碎片 &nbsp;📋图纸 &nbsp;⚔️装备</div>
           </div>
         </div>
         <div class="mission-card" id="mc-hard" ontouchend="startMission('hard')" onclick="startMission('hard')">
-          <div class="mc-icon-big">🔥</div>
+          <div class="mc-icon-big">🏜️</div>
           <div class="mc-info">
-            <div class="mc-name">精英战区</div>
-            <div class="mc-time">⏱ 15分钟</div>
-            <div class="mc-reward">🔩碎片×50~120 &nbsp;📋图纸×1~4</div>
+            <div class="mc-name">沙漠战区</div>
+            <div class="mc-time">⏱ 15分钟 · 精英难度</div>
+            <div class="mc-reward">更多碎片 &nbsp;稀有装备↑</div>
           </div>
           <div class="mc-req-badge" id="mc-hard-req">击杀≥100</div>
         </div>
         <div class="mission-card" id="mc-boss" ontouchend="startMission('boss')" onclick="startMission('boss')">
-          <div class="mc-icon-big">💀</div>
+          <div class="mc-icon-big">🧊</div>
           <div class="mc-info">
-            <div class="mc-name">BOSS突袭</div>
-            <div class="mc-time">⏱ 15分钟</div>
-            <div class="mc-reward">🔩碎片×80~200 &nbsp;📋传说图纸</div>
+            <div class="mc-name">冰川战区</div>
+            <div class="mc-time">⏱ 15分钟 · 地狱难度</div>
+            <div class="mc-reward">传说装备 &nbsp;极大量碎片</div>
           </div>
           <div class="mc-req-badge" id="mc-boss-req">击杀≥500</div>
         </div>
       </div>
     </div>
 
-    <!-- 特工 -->
+    <!-- 角色 -->
+    <div class="tab-page" id="tab-character">
+      <div class="char-layout">
+        <!-- 人形装备展示 -->
+        <div class="char-mannequin">
+          <div class="char-title">⚔️ 装备栏</div>
+          <div class="mannequin-grid">
+            <!-- 头盔 -->
+            <div></div>
+            <div class="equip-slot" id="slot-helmet" onclick="openEquipSlot('helmet')">
+              <div class="equip-slot-ico">⛑️</div><div class="equip-slot-lbl">头盔</div>
+            </div>
+            <div></div>
+            <!-- 武器 衣服 披风 -->
+            <div class="equip-slot" id="slot-weapon" onclick="openEquipSlot('weapon')">
+              <div class="equip-slot-ico">⚔️</div><div class="equip-slot-lbl">武器</div>
+            </div>
+            <div class="char-center"><div class="char-avatar-big">🧑‍✈️</div></div>
+            <div class="equip-slot" id="slot-cape" onclick="openEquipSlot('cape')">
+              <div class="equip-slot-ico">🦸</div><div class="equip-slot-lbl">披风</div>
+            </div>
+            <!-- 手套 衣服 裤子 -->
+            <div class="equip-slot" id="slot-gloves" onclick="openEquipSlot('gloves')">
+              <div class="equip-slot-ico">🧤</div><div class="equip-slot-lbl">手套</div>
+            </div>
+            <div class="equip-slot" id="slot-armor" onclick="openEquipSlot('armor')">
+              <div class="equip-slot-ico">👕</div><div class="equip-slot-lbl">衣服</div>
+            </div>
+            <div class="equip-slot" id="slot-pants" onclick="openEquipSlot('pants')">
+              <div class="equip-slot-ico">👖</div><div class="equip-slot-lbl">裤子</div>
+            </div>
+            <!-- 鞋子 -->
+            <div></div>
+            <div class="equip-slot" id="slot-boots" onclick="openEquipSlot('boots')">
+              <div class="equip-slot-ico">👟</div><div class="equip-slot-lbl">鞋子</div>
+            </div>
+            <div></div>
+          </div>
+        </div>
+        <!-- 装备属性总览 -->
+        <div class="equip-stats-bar" id="equipStatsBar"></div>
+        <!-- 背包 -->
+        <div>
+          <div class="inventory-header">
+            <div class="inv-title">🎒 装备背包</div>
+            <div class="inv-count" id="invCount">0 件</div>
+          </div>
+          <div class="inventory-grid" id="inventoryGrid"></div>
+        </div>
+      </div>
+      <!-- 装备详情弹窗 -->
+      <div id="equipModal">
+        <div class="modal-card" id="equipModalCard"></div>
+      </div>
+    </div>
+
+    <!-- 特工强化 -->
     <div class="tab-page" id="tab-agent">
       <div class="agent-hero">
         <div class="agent-avatar">🧑‍✈️</div>
@@ -498,8 +659,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0a0f;font-family:
     <button class="nav-btn active" onclick="switchTab('mission')" id="nav-mission">
       <span class="nav-icon">🎯</span>出击
     </button>
+    <button class="nav-btn" onclick="switchTab('character')" id="nav-character">
+      <span class="nav-icon">🧑‍✈️</span>角色
+    </button>
     <button class="nav-btn" onclick="switchTab('agent')" id="nav-agent">
-      <span class="nav-icon">🧑‍✈️</span>特工
+      <span class="nav-icon">⬆️</span>强化
     </button>
     <button class="nav-btn" onclick="switchTab('blueprints')" id="nav-blueprints">
       <span class="nav-icon">📋</span>图纸
@@ -632,10 +796,106 @@ function defaultSave(){
       pickupRange:{level:0,max:6},
     },
     shopPurchased:{}, totalRuns:0,
+    // 装备系统
+    equips:{ weapon:null, helmet:null, armor:null, gloves:null, pants:null, boots:null, cape:null },
+    inventory:[], // 背包中的装备列表，每个是 { uid, slotType, rarity, name, icon, stats }
   };
 }
+
+// ── 装备系统定义 ──
+const EQUIP_SLOTS = {
+  weapon:  { name:'武器',   icon:'⚔️',  statKey:'damage',      desc:'提升武器伤害' },
+  helmet:  { name:'头盔',   icon:'⛑️',  statKey:'maxHp',       desc:'提升最大HP' },
+  armor:   { name:'衣服',   icon:'👕',  statKey:'armor',       desc:'提升护甲减伤' },
+  gloves:  { name:'手套',   icon:'🧤',  statKey:'damage',      desc:'提升武器伤害' },
+  pants:   { name:'裤子',   icon:'👖',  statKey:'speed',       desc:'提升移动速度' },
+  boots:   { name:'鞋子',   icon:'👟',  statKey:'speed',       desc:'提升移动速度' },
+  cape:    { name:'披风',   icon:'🦸',  statKey:'regen',       desc:'提升生命回复' },
+};
+
+const EQUIP_RARITIES = {
+  common:  { name:'普通', color:'#95a5a6', mult:1.0 },
+  rare:    { name:'稀有', color:'#3498db', mult:1.5 },
+  epic:    { name:'史诗', color:'#9b59b6', mult:2.2 },
+  legend:  { name:'传说', color:'#f9ca24', mult:3.5 },
+};
+
+// 各部位基础属性范围
+const EQUIP_BASE_STATS = {
+  weapon: { damage:  [0.05, 0.12] },  // +5%~+12% 伤害
+  helmet: { maxHp:   [20,   50]   },  // +20~+50 HP
+  armor:  { armor:   [0.04, 0.10] },  // +4%~+10% 减伤
+  gloves: { damage:  [0.03, 0.08] },  // +3%~+8% 伤害
+  pants:  { speed:   [0.03, 0.08] },  // +3%~+8% 速度
+  boots:  { speed:   [0.04, 0.10] },  // +4%~+10% 速度
+  cape:   { regen:   [1,    3]    },  // +1~+3 HP/s
+};
+
+const EQUIP_NAMES = {
+  weapon: ['锈钢刀','钢铁枪','精钢剑','暗金战斧','传说神兵'],
+  helmet: ['铁皮帽','钢盔','战士头盔','精英头冠','传说战冠'],
+  armor:  ['破布衣','皮甲','锁链甲','板甲','传说龙鳞甲'],
+  gloves: ['布手套','皮手套','钢手套','精英战甲手','传说龙爪'],
+  pants:  ['破裤子','皮腿甲','链腿甲','精钢战裤','传说龙腿'],
+  boots:  ['旧皮靴','钢头靴','疾风靴','精英战靴','传说飞行靴'],
+  cape:   ['旧披风','皮披风','魔法披风','精英战袍','传说不死披风'],
+};
+
+let _equipUid = 1000;
+function generateEquip(slotType, rarity){
+  const rarDef  = EQUIP_RARITIES[rarity];
+  const baseStat= EQUIP_BASE_STATS[slotType];
+  const statKey = Object.keys(baseStat)[0];
+  const [min,max]= baseStat[statKey];
+  const baseVal  = min + Math.random()*(max-min);
+  const finalVal = parseFloat((baseVal * rarDef.mult).toFixed(3));
+  const nameList = EQUIP_NAMES[slotType];
+  const nameIdx  = {common:0,rare:1,epic:2,legend:3}[rarity]||0;
+  return {
+    uid: ++_equipUid,
+    slotType, rarity,
+    name: nameList[Math.min(nameIdx, nameList.length-1)],
+    icon: EQUIP_SLOTS[slotType].icon,
+    stats: { [statKey]: finalVal },
+  };
+}
+
+function rollEquipRarity(isBoss){
+  const r = Math.random();
+  if(isBoss){
+    if(r<0.05)  return 'legend';
+    if(r<0.25)  return 'epic';
+    if(r<0.60)  return 'rare';
+    return 'common';
+  } else {
+    if(r<0.01)  return 'epic';
+    if(r<0.08)  return 'rare';
+    return 'common';
+  }
+}
+
+// 获取当前所有装备的属性加成
+function getEquipBonus(){
+  const b={ damage:0, maxHp:0, armor:0, speed:0, regen:0 };
+  for(const slot in save.equips){
+    const eq = save.equips[slot];
+    if(!eq) continue;
+    for(const k in eq.stats) b[k] = (b[k]||0) + eq.stats[k];
+  }
+  return b;
+}
 let save = defaultSave();
-function loadSave(){ try{const d=JSON.parse(localStorage.getItem(SAVE_KEY));if(d){save={...defaultSave(),...d};for(const k in defaultSave().agentStats){if(!save.agentStats[k])save.agentStats[k]=defaultSave().agentStats[k];}}}catch(e){} }
+function loadSave(){
+  try{
+    const d=JSON.parse(localStorage.getItem(SAVE_KEY));
+    if(d){
+      save={...defaultSave(),...d};
+      for(const k in defaultSave().agentStats){if(!save.agentStats[k])save.agentStats[k]=defaultSave().agentStats[k];}
+      if(!save.equips)   save.equips={weapon:null,helmet:null,armor:null,gloves:null,pants:null,boots:null,cape:null};
+      if(!save.inventory) save.inventory=[];
+    }
+  }catch(e){}
+}
 function writeSave(){ localStorage.setItem(SAVE_KEY,JSON.stringify(save)); }
 loadSave();
 
@@ -688,9 +948,171 @@ function switchTab(tab){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+tab).classList.add('active');
   document.getElementById('nav-'+tab).classList.add('active');
-  if(tab==='agent') renderAgentTab();
+  if(tab==='character')  renderCharacterTab();
+  if(tab==='agent')      renderAgentTab();
   if(tab==='blueprints') renderBPTab();
-  if(tab==='shop') renderShopTab();
+  if(tab==='shop')       renderShopTab();
+}
+
+// ── 角色/装备 Tab ──
+function renderCharacterTab(){
+  renderEquipSlots();
+  renderEquipStats();
+  renderInventory();
+}
+
+function renderEquipSlots(){
+  for(const slot in EQUIP_SLOTS){
+    const el  = document.getElementById('slot-'+slot);
+    if(!el) continue;
+    const eq  = save.equips[slot];
+    const def = EQUIP_SLOTS[slot];
+    if(eq){
+      el.className = `equip-slot filled rarity-${eq.rarity}`;
+      el.innerHTML = `<div class="equip-slot-ico">${eq.icon}</div>
+        <div class="equip-slot-name">${eq.name}</div>`;
+    } else {
+      el.className = 'equip-slot';
+      el.innerHTML = `<div class="equip-slot-ico">${def.icon}</div>
+        <div class="equip-slot-lbl">${def.name}</div>`;
+    }
+  }
+}
+
+function renderEquipStats(){
+  const b   = getEquipBonus();
+  const bar = document.getElementById('equipStatsBar');
+  const fmt = (k,v)=>{
+    if(k==='damage'||k==='armor'||k==='speed') return `+${Math.round(v*100)}%`;
+    if(k==='maxHp')  return `+${Math.round(v)} HP`;
+    if(k==='regen')  return `+${v.toFixed(1)} HP/s`;
+    return `+${v}`;
+  };
+  const rows = [
+    {icon:'⚔️', label:'伤害加成', key:'damage'},
+    {icon:'❤️', label:'生命值',   key:'maxHp'},
+    {icon:'🛡️',label:'护甲减伤', key:'armor'},
+    {icon:'👟', label:'移动速度', key:'speed'},
+    {icon:'💊', label:'生命回复', key:'regen'},
+  ];
+  bar.innerHTML = rows.map(r=>`
+    <div class="equip-stat-item">
+      <span class="equip-stat-ico">${r.icon}</span>
+      <span style="color:#888;flex:1">${r.label}</span>
+      <span class="equip-stat-val">${b[r.key]>0?fmt(r.key,b[r.key]):'—'}</span>
+    </div>`).join('');
+}
+
+function renderInventory(){
+  const grid = document.getElementById('inventoryGrid');
+  const inv  = save.inventory;
+  document.getElementById('invCount').textContent = inv.length+' 件';
+  if(inv.length===0){
+    grid.innerHTML='<div style="color:#555;font-size:11px;text-align:center;grid-column:1/-1;padding:20px">背包空空如也<br>击败Boss可获得装备</div>';
+    return;
+  }
+  grid.innerHTML='';
+  inv.forEach(eq=>{
+    const isEquipped = Object.values(save.equips).some(e=>e&&e.uid===eq.uid);
+    const rarDef = EQUIP_RARITIES[eq.rarity];
+    const statKey= Object.keys(eq.stats)[0];
+    const statVal= eq.stats[statKey];
+    const statTxt= statKey==='maxHp'?`+${Math.round(statVal)}HP`
+      :statKey==='regen'?`+${statVal.toFixed(1)}HP/s`
+      :`+${Math.round(statVal*100)}%`;
+    const el=document.createElement('div');
+    el.className=`inv-item rarity-${eq.rarity}${isEquipped?' equipped':''}`;
+    el.innerHTML=`
+      ${isEquipped?'<div class="inv-equip-badge">已装</div>':''}
+      <div class="inv-ico">${eq.icon}</div>
+      <div class="inv-name">${eq.name}</div>
+      <div class="inv-rar" style="color:${rarDef.color}">${rarDef.name}</div>
+      <div class="inv-stat">${statTxt}</div>`;
+    el.onclick=()=>openEquipDetail(eq);
+    grid.appendChild(el);
+  });
+}
+
+let _modalEquip=null;
+function openEquipSlot(slot){
+  // 点装备槽：显示当前装备详情 或 打开选择已有装备
+  const eq = save.equips[slot];
+  if(eq) openEquipDetail(eq);
+  else   openEquipSelectForSlot(slot);
+}
+
+function openEquipSelectForSlot(slot){
+  // 找背包中同部位装备
+  const candidates = save.inventory.filter(e=>e.slotType===slot);
+  if(candidates.length===0){
+    showToast(`背包中没有${EQUIP_SLOTS[slot].name}`); return;
+  }
+  // 直接选最好的或显示列表（简化：显示第一个）
+  openEquipDetail(candidates[0]);
+}
+
+function openEquipDetail(eq){
+  _modalEquip = eq;
+  const rarDef   = EQUIP_RARITIES[eq.rarity];
+  const isEquipped= Object.values(save.equips).some(e=>e&&e.uid===eq.uid);
+  const statKey  = Object.keys(eq.stats)[0];
+  const statVal  = eq.stats[statKey];
+  const statTxt  = statKey==='maxHp'?`最大HP +${Math.round(statVal)}`
+    :statKey==='regen'?`生命回复 +${statVal.toFixed(1)} HP/s`
+    :statKey==='damage'?`武器伤害 +${Math.round(statVal*100)}%`
+    :statKey==='armor'?`护甲减伤 +${Math.round(statVal*100)}%`
+    :statKey==='speed'?`移动速度 +${Math.round(statVal*100)}%`
+    :`+${statVal}`;
+  const card = document.getElementById('equipModalCard');
+  card.innerHTML=`
+    <div class="modal-ico">${eq.icon}</div>
+    <div class="modal-name" style="color:${rarDef.color}">${eq.name}</div>
+    <div class="modal-rar" style="color:${rarDef.color}">${rarDef.name} · ${EQUIP_SLOTS[eq.slotType].name}</div>
+    <div class="modal-stat"><span style="font-size:18px">${['⚔️','❤️','🛡️','👟','💊'][['damage','maxHp','armor','speed','regen'].indexOf(statKey)]||'✨'}</span> ${statTxt}</div>
+    <div class="modal-btns">
+      ${isEquipped
+        ?`<button class="btn-unequip" onclick="unequipItem('${eq.slotType}')">卸下装备</button>`
+        :`<button class="btn-equip" onclick="equipItem(${eq.uid})">装备</button>`}
+      <button class="btn-discard" onclick="discardItem(${eq.uid})">🗑️</button>
+    </div>
+    <button class="btn-close-modal" onclick="closeEquipModal()">取消</button>`;
+  document.getElementById('equipModal').style.display='flex';
+}
+
+function equipItem(uid){
+  const eq = save.inventory.find(e=>e.uid===uid);
+  if(!eq) return;
+  // 如果该槽已有装备，先放回背包
+  const old = save.equips[eq.slotType];
+  if(old) save.inventory.push(old);
+  save.equips[eq.slotType] = eq;
+  // 从背包移除
+  save.inventory = save.inventory.filter(e=>e.uid!==uid);
+  writeSave(); closeEquipModal(); renderCharacterTab();
+}
+
+function unequipItem(slot){
+  const eq = save.equips[slot];
+  if(!eq) return;
+  save.inventory.push(eq);
+  save.equips[slot]=null;
+  writeSave(); closeEquipModal(); renderCharacterTab();
+}
+
+function discardItem(uid){
+  save.equips[Object.keys(save.equips).find(k=>save.equips[k]&&save.equips[k].uid===uid)]=null;
+  save.inventory = save.inventory.filter(e=>e.uid!==uid);
+  writeSave(); closeEquipModal(); renderCharacterTab();
+}
+
+function closeEquipModal(){ document.getElementById('equipModal').style.display='none'; }
+
+function showToast(msg){
+  const t=document.createElement('div');
+  t.style.cssText='position:absolute;bottom:120px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:8px 16px;border-radius:20px;font-size:12px;z-index:100;pointer-events:none;';
+  t.textContent=msg;
+  document.getElementById('lobbyContent').appendChild(t);
+  setTimeout(()=>t.remove(),2000);
 }
 
 function renderLobby(){
@@ -905,9 +1327,46 @@ const BOSS_DROP_POOL = [
 ];
 let bossDropItems=[];
 function spawnBossDrop(x, y){
-  if(Math.random() < 0.5) return; // 50%概率不掉落
+  if(Math.random() < 0.5) return; // 50%概率不掉落buff道具
   const item = BOSS_DROP_POOL[rngI(0, BOSS_DROP_POOL.length-1)];
   bossDropItems.push({ x, y, item, r:10, bobTime:rng(0,TAU), alive:true });
+}
+
+// ── 局内装备掉落 ──
+let equipDrops=[];  // 局内掉落的装备（待拾取）
+let runEquips=[];   // 本局已收集装备（结算时带出）
+
+function spawnEquipDrop(x,y,isBoss){
+  const slots   = Object.keys(EQUIP_SLOTS);
+  const slotType= slots[rngI(0,slots.length-1)];
+  const rarity  = rollEquipRarity(isBoss);
+  // 沙漠/冰川地图提升稀有度
+  let finalRarity=rarity;
+  if(currentMission==='hard' && rarity==='common' && Math.random()<0.4) finalRarity='rare';
+  if(currentMission==='boss' && rarity==='common' && Math.random()<0.7) finalRarity='rare';
+  if(currentMission==='boss' && rarity==='rare'   && Math.random()<0.3) finalRarity='epic';
+  const eq = generateEquip(slotType, finalRarity);
+  const rarDef=EQUIP_RARITIES[finalRarity];
+  equipDrops.push({x,y,eq,r:11,bobTime:rng(0,TAU),color:rarDef.color});
+}
+
+function updateEquipDrops(delta){
+  for(let i=equipDrops.length-1;i>=0;i--){
+    const d=equipDrops[i];
+    d.bobTime+=delta*1.8;
+    const dd=dist(player,d);
+    if(dd<player.pickupRange+d.r){
+      const ang=Math.atan2(player.y-d.y,player.x-d.x);
+      d.x+=Math.cos(ang)*260*delta; d.y+=Math.sin(ang)*260*delta;
+    }
+    if(dist(player,d)<player.r+d.r){
+      runEquips.push(d.eq);
+      Audio.pickup();
+      spawnParticles(d.x,d.y,d.color,14,130,0.55);
+      spawnDmgText(d.x,d.y-20,d.eq.name,d.color);
+      equipDrops.splice(i,1);
+    }
+  }
 }
 function updateBossDropItems(delta){
   for(let i=bossDropItems.length-1; i>=0; i--){
@@ -1248,13 +1707,36 @@ _gameUI.addEventListener('touchcancel', e=>{ e.preventDefault(); releaseJoystick
 // decorations
 const decorations=[];
 function genMap(){
+  const theme=getMapTheme();
   decorations.length=0;
-  for(let i=0;i<200;i++){const t=rngI(0,2);decorations.push({x:rng(40,WORLD_W-40),y:rng(40,WORLD_H-40),t,r:t===0?rng(8,22):rng(5,14),color:['#1e3a1e','#0d2b0d','#152c15','#183018'][rngI(0,3)]});}
-  for(let i=0;i<70;i++) decorations.push({x:rng(40,WORLD_W-40),y:rng(40,WORLD_H-40),t:3,r:rng(6,18),color:'#2a2a2a'});
+  for(let i=0;i<200;i++){const t=rngI(0,2);decorations.push({x:rng(40,WORLD_W-40),y:rng(40,WORLD_H-40),t,r:t===0?rng(8,22):rng(5,14),color:theme.decoColors[0][rngI(0,3)]});}
+  for(let i=0;i<70;i++) decorations.push({x:rng(40,WORLD_W-40),y:rng(40,WORLD_H-40),t:3,r:rng(6,18),color:theme.decoColors[1]});
 }
 
 // ── TILES ──
-const TILE_COLORS=['#1a2a1a','#182318','#1c2c1c','#172717'];
+// 三张地图配色
+const MAP_THEMES = {
+  normal: {
+    tiles:    ['#1a2a1a','#182318','#1c2c1c','#172717'],
+    bg:       '#0d1a0d',
+    decoColors:[['#1e3a1e','#0d2b0d','#152c15','#183018'],'#2a2a2a'],
+    border:   '#e74c3c44',
+  },
+  hard: { // 沙漠
+    tiles:    ['#2e2210','#281e0d','#32260f','#2a1e0c'],
+    bg:       '#1a0f05',
+    decoColors:[['#5c3d1a','#4a2e0e','#6b4520','#3d2508'],'#4a3520'],
+    border:   '#e67e2244',
+  },
+  boss: { // 冰川
+    tiles:    ['#1a2535','#162030','#1e2a3c','#121b28'],
+    bg:       '#0a1020',
+    decoColors:[['#2a4060','#1e3050','#304870','#243858'],'#304060'],
+    border:   '#74b9ff44',
+  },
+};
+function getMapTheme(){ return MAP_THEMES[currentMission]||MAP_THEMES.normal; }
+
 const TILE_SIZE=80;
 
 // ── DRAW ENEMIES ──
@@ -1404,6 +1886,9 @@ function dealDmg(e,dmg){
       bossesDefeated++;
       Audio.bossKill();
       spawnBossDrop(e.x, e.y);
+      // Boss 80%概率掉装备，必定掉1件，50%掉2件
+      spawnEquipDrop(e.x+rng(-20,20), e.y+rng(-20,20), true);
+      if(Math.random()<0.5) spawnEquipDrop(e.x+rng(-30,30), e.y+rng(-30,30), true);
       if(arena.bossUid===e.uid){
         arena.active=false;
         arena.bossUid=-1;
@@ -1423,6 +1908,14 @@ function dealDmg(e,dmg){
       const bpAngle = gemAngle + Math.PI/2 + rng(-0.3, 0.3);
       const bpDist  = rng(18, 28);
       spawnBlueprintPickup(e.x + Math.cos(bpAngle)*bpDist, e.y + Math.sin(bpAngle)*bpDist, rollBlueprint(currentMission));
+    }
+    // 装备掉落：小怪3%，精英15%（Boss已在上方单独处理）
+    if(!e.isBoss){
+      const eqChance = e.typeId==='elite'?.15:e.typeId==='tank'?.05:e.typeId==='shooter'?.03:.01;
+      if(Math.random()<eqChance){
+        const eqAngle=gemAngle-Math.PI/3+rng(-0.3,0.3);
+        spawnEquipDrop(e.x+Math.cos(eqAngle)*rng(20,35), e.y+Math.sin(eqAngle)*rng(20,35), false);
+      }
     }
     spawnParticles(e.x,e.y,e.color,e.isBoss?28:10,110,.55);
   }
@@ -1617,17 +2110,18 @@ function render(){
   ctx.translate(CW/2-cam.x, CH/2-cam.y);
 
   // world bg
-  ctx.fillStyle='#0d1a0d'; ctx.fillRect(0,0,WORLD_W,WORLD_H);
+  const mapTheme=getMapTheme();
+  ctx.fillStyle=mapTheme.bg; ctx.fillRect(0,0,WORLD_W,WORLD_H);
   // tiles
   const sx0=Math.max(0,Math.floor((cam.x-CW/2)/TILE_SIZE));
   const sy0=Math.max(0,Math.floor((cam.y-CH/2)/TILE_SIZE));
   const sx1=Math.min(WORLD_W/TILE_SIZE,Math.ceil((cam.x+CW/2)/TILE_SIZE));
   const sy1=Math.min(WORLD_H/TILE_SIZE,Math.ceil((cam.y+CH/2)/TILE_SIZE));
   for(let tx=sx0;tx<=sx1;tx++) for(let ty=sy0;ty<=sy1;ty++){
-    ctx.fillStyle=TILE_COLORS[(tx+ty)%TILE_COLORS.length];
+    ctx.fillStyle=mapTheme.tiles[(tx+ty)%mapTheme.tiles.length];
     ctx.fillRect(tx*TILE_SIZE,ty*TILE_SIZE,TILE_SIZE,TILE_SIZE);
   }
-  ctx.strokeStyle='#e74c3c44'; ctx.lineWidth=5; ctx.strokeRect(2,2,WORLD_W-4,WORLD_H-4);
+  ctx.strokeStyle=mapTheme.border; ctx.lineWidth=5; ctx.strokeRect(2,2,WORLD_W-4,WORLD_H-4);
 
   // ── Boss竞技场 ──
   if(arena.active && arena.r>0){
@@ -1745,6 +2239,33 @@ function render(){
     // 图标文字
     ctx.font=`${d.r}px serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.fillText(d.item.icon,0,0.5);
+    ctx.restore();
+  });
+
+  // equip drops
+  equipDrops.forEach(d=>{
+    if(d.x<vx0||d.x>vx1||d.y<vy0||d.y>vy1) return;
+    const bob=Math.sin(d.bobTime)*3;
+    ctx.save(); ctx.translate(d.x,d.y+bob);
+    // 稀有度光晕
+    const pulse=0.65+Math.sin(d.bobTime*1.8)*0.35;
+    const gl=ctx.createRadialGradient(0,0,0,0,0,d.r*3*pulse);
+    gl.addColorStop(0,d.color+'55'); gl.addColorStop(1,'transparent');
+    ctx.beginPath(); ctx.arc(0,0,d.r*3*pulse,0,TAU); ctx.fillStyle=gl; ctx.fill();
+    // 旋转菱形
+    ctx.rotate(d.bobTime*0.4);
+    ctx.beginPath();
+    ctx.moveTo(0,-d.r); ctx.lineTo(d.r*.7,0); ctx.lineTo(0,d.r); ctx.lineTo(-d.r*.7,0);
+    ctx.closePath();
+    ctx.fillStyle=d.color; ctx.fill();
+    ctx.strokeStyle='#fff8'; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.rotate(-d.bobTime*0.4);
+    // 图标
+    ctx.font=`${d.r*1.1}px serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(d.eq.icon,0,1);
+    // 装备名
+    ctx.font=`bold ${d.r*0.7}px monospace`; ctx.fillStyle='#fff';
+    ctx.fillText(d.eq.name,0,d.r+9);
     ctx.restore();
   });
 
@@ -1869,7 +2390,7 @@ function gameLoop(ts){
     updatePlayer(dt); updateWeapons(dt); updateBullets(dt);
     updateOrbitalSatellites(dt);
     updateEnemies(dt); updateGems(dt); updateFragPickups(dt);
-    updateParticles(dt); updateShockwaves(dt); updateArena(dt); updateBossDropItems(dt); updateBlueprintPickups(dt); updateSpawner(dt);
+    updateParticles(dt); updateShockwaves(dt); updateArena(dt); updateBossDropItems(dt); updateBlueprintPickups(dt); updateEquipDrops(dt); updateSpawner(dt);
     updateHUD();
     if(gameTime>=MISSION_DURATION){endRun(true);return;}
   }
@@ -1921,19 +2442,23 @@ function startGame(){
   document.getElementById('levelupScreen').style.display='none';
   gameTime=0;dt=0;lastTs=0; killCount=0;totalDmgDealt=0;runFragments=0;runBlueprints=[];
   wave=1;waveTimer=0;spawnTimer=1; bossesDefeated=0;
-  bullets=[];enemies=[];gems=[];particles=[];shockwaves=[];fragPickups=[];orbitalSatellites=[];bossDropItems=[];blueprintPickups=[];
+  bullets=[];enemies=[];gems=[];particles=[];shockwaves=[];fragPickups=[];orbitalSatellites=[];bossDropItems=[];blueprintPickups=[];equipDrops=[];runEquips=[];
   arena.active=false; arena.r=0; arena.bossUid=-1;
   levelUpQueue=0;levelUpActive=false;_uid=0; gState='play';
   releaseJoystick();
 
   const b=getPermBonus();
+  const eb=getEquipBonus(); // 装备加成
   Object.assign(player,{
     x:WORLD_W/2,y:WORLD_H/2,vx:0,vy:0,
-    hp:100+b.maxHp, maxHp:100+b.maxHp, speed:85,
+    hp:100+b.maxHp+(eb.maxHp||0), maxHp:100+b.maxHp+(eb.maxHp||0), speed:85,
     xp:0,xpNext:6,level:1,invincible:0,facing:0,weapons:[],
-    dmgMult:1+b.damage, speedMult:1+b.speed,
-    hpRegen:b.regen, pickupRange:40+b.pickupRange,
-    armorPct:b.armor, extraShot:0,
+    dmgMult:1+b.damage+(eb.damage||0),
+    speedMult:1+b.speed+(eb.speed||0),
+    hpRegen:b.regen+(eb.regen||0),
+    pickupRange:40+b.pickupRange,
+    armorPct:Math.min(0.85, b.armor+(eb.armor||0)),
+    extraShot:0,
   });
   if(save.shopPurchased['extraHp50']){player.hp+=50;player.maxHp+=50;}
   if(save.shopPurchased['startWithGem']) player.pickupRange+=80;
@@ -1982,6 +2507,21 @@ function endRun(completed){
     chip.innerHTML=`${def.icon} ${def.name} ×${cnt}`; lootEl.appendChild(chip);
   });
   document.getElementById('irBlueprints').textContent=runBlueprints.length;
+  // 装备战利品
+  if(runEquips.length>0){
+    const eqHeader=document.createElement('div');
+    eqHeader.style.cssText='color:#f9ca24;font-size:11px;font-weight:bold;width:100%;text-align:center;margin-top:6px;';
+    eqHeader.textContent='⚔️ 装备战利品';
+    lootEl.appendChild(eqHeader);
+    runEquips.forEach(eq=>{
+      const rarDef=EQUIP_RARITIES[eq.rarity];
+      const chip=document.createElement('div');
+      chip.className='loot-chip';
+      chip.style.borderColor=rarDef.color;
+      chip.innerHTML=`${eq.icon} <span style="color:${rarDef.color}">${eq.name}</span>`;
+      lootEl.appendChild(chip);
+    });
+  }
   document.getElementById('resultsScreen').style.display='flex';
   render();
 }
@@ -1989,6 +2529,8 @@ function endRun(completed){
 function extractAndReturn(){
   save.fragments+=runFragments;
   runBlueprints.forEach(id=>{save.blueprints[id]=(save.blueprints[id]||0)+1;});
+  // 装备加入背包
+  runEquips.forEach(eq=>{ save.inventory.push(eq); });
   writeSave(); returnToLobby();
 }
 function abandonAndReturn(){ writeSave(); returnToLobby(); }
