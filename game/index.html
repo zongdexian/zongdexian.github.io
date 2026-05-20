@@ -811,8 +811,8 @@ let currentMission='normal';
 const cam={x:0,y:0};
 
 const player={
-  x:WORLD_W/2, y:WORLD_H/2, vx:0, vy:0, r:14,
-  hp:100, maxHp:100, speed:170,
+  x:WORLD_W/2, y:WORLD_H/2, vx:0, vy:0, r:7,
+  hp:100, maxHp:100, speed:85,
   xp:0, xpNext:6, level:1,
   invincible:0, weapons:[], facing:0,
   dmgMult:1, speedMult:1, hpRegen:0, pickupRange:40, armorPct:0, extraShot:0,
@@ -827,7 +827,7 @@ const WEAPON_DEFS={
   grenade:{id:'grenade',name:'榴弹',icon:'💥',fireRate:.4,  bulletSpeed:220,damage:50,range:220,bulletColor:'#fd79a8',bulletR:8,spread:.12,count:1,aoe:75,desc:'AOE爆炸，升级增加数量'},
   laser:  {id:'laser',  name:'激光',icon:'🔴',fireRate:.9,  bulletSpeed:640,damage:24,range:520,bulletColor:'#ff4757',bulletR:3,spread:.01,count:1,pierce:5,desc:'穿透激光，升级变粗'},
   // 轨道弹：特殊武器，不发射子弹，而是在周围生成旋转卫星
-  orbital:{id:'orbital',name:'卫星炮',icon:'🌀',fireRate:0, bulletSpeed:0, damage:20,range:28, bulletColor:'#a29bfe',bulletR:8,spread:0,count:1,desc:'绕身旋转，升级增加卫星数',isOrbital:true},
+  orbital:{id:'orbital',name:'卫星炮',icon:'🌀',fireRate:0, bulletSpeed:0, damage:20,range:14, bulletColor:'#a29bfe',bulletR:4,spread:0,count:1,desc:'绕身旋转，升级增加卫星数',isOrbital:true},
 };
 function createWeapon(id){return{defId:id,level:1,cooldown:0,bonusDmg:0,bonusRate:0,bonusRange:0,bonusR:0,bonusCount:0};}
 
@@ -849,12 +849,12 @@ function spawnBullet(x,y,angle,def,owner,wi,overrideR){
 }
 
 const ENEMY_TYPES={
-  grunt:  {typeId:'grunt',  r:10,hp:30,  speed:72, color:'#e74c3c',c2:'#c0392b',xp:4, dmg:8, isMelee:true, fragDrop:1},
-  fast:   {typeId:'fast',   r:8, hp:18,  speed:145,color:'#a29bfe',c2:'#6c5ce7',xp:3, dmg:6, isMelee:true, fragDrop:1},
-  tank:   {typeId:'tank',   r:18,hp:180, speed:42, color:'#636e72',c2:'#2d3436',xp:15,dmg:20,isMelee:true, fragDrop:4},
-  shooter:{typeId:'shooter',r:11,hp:50,  speed:50, color:'#fdcb6e',c2:'#e17055',xp:8, dmg:12,isMelee:false,shootRate:0.55,fragDrop:3},
-  elite:  {typeId:'elite',  r:22,hp:400, speed:80, color:'#e17055',c2:'#d63031',xp:40,dmg:25,isMelee:true, fragDrop:8},
-  boss:   {typeId:'boss',   r:32,hp:1500,speed:55, color:'#fd79a8',c2:'#e84393',xp:150,dmg:35,isMelee:false,shootRate:0.9,isBoss:true,fragDrop:30},
+  grunt:  {typeId:'grunt',  r:5, hp:30,  speed:36, color:'#e74c3c',c2:'#c0392b',xp:4, dmg:8, isMelee:true, fragDrop:1},
+  fast:   {typeId:'fast',   r:4, hp:18,  speed:72, color:'#a29bfe',c2:'#6c5ce7',xp:3, dmg:6, isMelee:true, fragDrop:1},
+  tank:   {typeId:'tank',   r:9, hp:180, speed:21, color:'#636e72',c2:'#2d3436',xp:15,dmg:20,isMelee:true, fragDrop:4},
+  shooter:{typeId:'shooter',r:5, hp:50,  speed:25, color:'#fdcb6e',c2:'#e17055',xp:8, dmg:12,isMelee:false,shootRate:0.55,fragDrop:3},
+  elite:  {typeId:'elite',  r:11,hp:400, speed:40, color:'#e17055',c2:'#d63031',xp:40,dmg:25,isMelee:true, fragDrop:8},
+  boss:   {typeId:'boss',   r:16,hp:1500,speed:27, color:'#fd79a8',c2:'#e84393',xp:150,dmg:35,isMelee:false,shootRate:0.9,isBoss:true,fragDrop:30},
 };
 let enemies=[], _uid=0;
 function getDiffScale(t){
@@ -901,7 +901,7 @@ let orbitalSatellites=[];  // {angle, orbitR, angSpeed, r, color, damage, pierce
 
 // 卫星炮轨道半径：Lv1=280, Lv12=195，线性插值
 // range: 280 - (level-1) * (280-195)/11  = 280 - (level-1)*7.727
-const ORBITAL_R_LV1  = 28;   // 角色直径28 × 1 = 轨道半径28，直径56刚好是角色2倍
+const ORBITAL_R_LV1  = 14;   // 角色直径14 × 1 = 轨道半径14，直径28刚好是角色2倍
 const ORBITAL_R_LV12 = 195;  // Lv12达到屏幕横向1/2
 function orbitalRadius(level){
   const lv = clamp(level, 1, 12);
@@ -1748,7 +1748,7 @@ function startGame(){
   const b=getPermBonus();
   Object.assign(player,{
     x:WORLD_W/2,y:WORLD_H/2,vx:0,vy:0,
-    hp:100+b.maxHp, maxHp:100+b.maxHp, speed:170,
+    hp:100+b.maxHp, maxHp:100+b.maxHp, speed:85,
     xp:0,xpNext:6,level:1,invincible:0,facing:0,weapons:[],
     dmgMult:1+b.damage, speedMult:1+b.speed,
     hpRegen:b.regen, pickupRange:40+b.pickupRange,
