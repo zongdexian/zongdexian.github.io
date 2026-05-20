@@ -1237,7 +1237,15 @@ function updateWeapons(delta){
     w.cooldown=1/rate;
     let target=null, minD=Infinity;
     const maxR=(def.range+w.bonusRange)*1.6;
-    for(let i=0;i<enemies.length;i++){const e=enemies[i],d=dist(player,e);if(d<minD&&d<maxR){minD=d;target=e;}}
+    // 只瞄准屏幕内可见的敌人（世界坐标转屏幕坐标，判断是否在视口内）
+    const hW=CW/2, hH=CH/2;
+    for(let i=0;i<enemies.length;i++){
+      const e=enemies[i];
+      const sx=e.x-cam.x+hW, sy=e.y-cam.y+hH;
+      if(sx<-e.r||sx>CW+e.r||sy<-e.r||sy>CH+e.r) continue; // 屏幕外跳过
+      const d=dist(player,e);
+      if(d<minD&&d<maxR){minD=d;target=e;}
+    }
     if(!target) return;
     const angle=Math.atan2(target.y-player.y,target.x-player.x);
     const extra=player.extraShot||0;
