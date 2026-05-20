@@ -827,7 +827,7 @@ const WEAPON_DEFS={
   grenade:{id:'grenade',name:'榴弹',icon:'💥',fireRate:.4,  bulletSpeed:220,damage:50,range:220,bulletColor:'#fd79a8',bulletR:8,spread:.12,count:1,aoe:75,desc:'AOE爆炸，升级增加数量'},
   laser:  {id:'laser',  name:'激光',icon:'🔴',fireRate:.9,  bulletSpeed:640,damage:24,range:520,bulletColor:'#ff4757',bulletR:3,spread:.01,count:1,pierce:5,desc:'穿透激光，升级变粗'},
   // 轨道弹：特殊武器，不发射子弹，而是在周围生成旋转卫星
-  orbital:{id:'orbital',name:'卫星炮',icon:'🌀',fireRate:0, bulletSpeed:0, damage:20,range:14, bulletColor:'#a29bfe',bulletR:4,spread:0,count:1,desc:'绕身旋转，升级增加卫星数',isOrbital:true},
+  orbital:{id:'orbital',name:'卫星炮',icon:'🌀',fireRate:0, bulletSpeed:0, damage:20,range:14, bulletColor:'#a29bfe',bulletR:2,spread:0,count:1,desc:'绕身旋转，升级增加卫星数',isOrbital:true},
 };
 function createWeapon(id){return{defId:id,level:1,cooldown:0,bonusDmg:0,bonusRate:0,bonusRange:0,bonusR:0,bonusCount:0};}
 
@@ -926,7 +926,7 @@ function syncOrbitalSatellites(){
       angle:        baseAngle + (TAU / totalCount) * i,
       orbitR:       totalR,
       angSpeed:     2.0,
-      r:            9,
+      r:            4,
       damage:       totalDmg,
       flashTimer:   0,
       hitCooldowns: {},
