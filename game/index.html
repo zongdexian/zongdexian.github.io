@@ -1070,13 +1070,14 @@ function getWavePool(){
   const p=['grunt','grunt','grunt','fast'];
   if(wave>=3)  p.push('fast','fast');
   if(wave>=5)  p.push('tank');
-  if(wave>=8)  p.push('shooter');
   if(wave>=12) p.push('elite');
-  if(wave>=15) p.push('shooter','tank');
+  if(wave>=15) p.push('tank');
   if(wave>=20) p.push('elite','elite');
-  if(wave>=30) p.push('elite','tank','shooter');
-  if(currentMission==='hard') p.push('elite','shooter');
+  if(wave>=30) p.push('elite','tank');
+  if(currentMission==='hard') p.push('elite');
   if(currentMission==='boss') p.push('elite','elite','tank','tank');
+  // 射手只占约5%概率单独插入
+  if(wave>=8) p.push('shooter'); // 池约20个槽，shooter占1个≈5%
   return p;
 }
 function spawnWaveEnemy(){
