@@ -1081,7 +1081,13 @@ function getWavePool(){
   return p;
 }
 function spawnWaveEnemy(){
-  const pool=getWavePool(), type=pool[rngI(0,pool.length-1)];
+  const pool=getWavePool();
+  let type=pool[rngI(0,pool.length-1)];
+  // 射手额外过滤：抽到shooter后再做95%概率重抽
+  if(type==='shooter' && Math.random()<0.95){
+    const fallback=pool.filter(t=>t!=='shooter');
+    type=fallback.length>0?fallback[rngI(0,fallback.length-1)]:'grunt';
+  }
   const a=rng(0,TAU), d=Math.max(CW,CH)*.8+60;
   spawnEnemy(type,clamp(player.x+Math.cos(a)*d,60,WORLD_W-60),clamp(player.y+Math.sin(a)*d,60,WORLD_H-60));
 }
