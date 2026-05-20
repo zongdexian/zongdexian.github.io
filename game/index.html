@@ -977,7 +977,7 @@ let orbitalSatellites=[];  // {angle, orbitR, angSpeed, r, color, damage, pierce
 
 // 卫星炮轨道半径：Lv1=280, Lv12=195，线性插值
 // range: 280 - (level-1) * (280-195)/11  = 280 - (level-1)*7.727
-const ORBITAL_R_LV1  = 14;   // 角色直径14 × 1 = 轨道半径14，直径28刚好是角色2倍
+const ORBITAL_R_LV1  = 28;   // Lv1轨道半径28，直径56=角色直径4倍
 const ORBITAL_R_LV12 = 195;  // Lv12达到屏幕横向1/2
 function orbitalRadius(level){
   const lv = clamp(level, 1, 12);
@@ -1389,7 +1389,10 @@ function dealDmg(e,dmg){
   if(e.hp<=0){
     e.alive=false; killCount++; save.totalKills++;
     Audio.kill();
-    spawnGem(e.x,e.y,e.xp);
+    // 经验宝石：往随机方向偏移，避免叠在一起
+    const gemAngle = rng(0, TAU);
+    const gemDist  = rng(12, 22);
+    spawnGem(e.x + Math.cos(gemAngle)*gemDist, e.y + Math.sin(gemAngle)*gemDist, e.xp);
     if(e.isBoss){
       bossesDefeated++;
       Audio.bossKill();
@@ -1401,9 +1404,17 @@ function dealDmg(e,dmg){
       }
     }
     const fd=e.fragDrop+(currentMission==='hard'?rngI(1,3):currentMission==='boss'?rngI(3,8):0);
-    spawnFragPickup(e.x+rng(-8,8),e.y+rng(-8,8),fd);
-    const bpChance=e.isBoss?.8:e.typeId==='elite'?.15:.03;
-    if(Math.random()<bpChance) spawnBlueprintPickup(e.x, e.y, rollBlueprint(currentMission));
+    // 碎片：与经验宝石相反方向偏移
+    const fragAngle = gemAngle + Math.PI + rng(-0.5, 0.5);
+    const fragDist  = rng(14, 24);
+    spawnFragPickup(e.x + Math.cos(fragAngle)*fragDist, e.y + Math.sin(fragAngle)*fragDist, fd);
+    // 图纸：垂直方向偏移
+    const bpChance=e.isBoss?.8:e.typeId==='elite'?.15:e.typeId==='tank'?.03:e.typeId==='shooter'?.02:.005;
+    if(Math.random()<bpChance){
+      const bpAngle = gemAngle + Math.PI/2 + rng(-0.3, 0.3);
+      const bpDist  = rng(18, 28);
+      spawnBlueprintPickup(e.x + Math.cos(bpAngle)*bpDist, e.y + Math.sin(bpAngle)*bpDist, rollBlueprint(currentMission));
+    }
     spawnParticles(e.x,e.y,e.color,e.isBoss?28:10,110,.55);
   }
 }
