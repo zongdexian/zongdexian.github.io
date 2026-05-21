@@ -1339,13 +1339,8 @@ let runEquips=[];   // 本局已收集装备（结算时带出）
 function spawnEquipDrop(x,y,isBoss){
   const slots   = Object.keys(EQUIP_SLOTS);
   const slotType= slots[rngI(0,slots.length-1)];
-  const rarity  = rollEquipRarity(isBoss);
-  // 沙漠/冰川地图提升稀有度
-  let finalRarity=rarity;
-  if(currentMission==='hard' && rarity==='common' && Math.random()<0.4) finalRarity='rare';
-  if(currentMission==='boss' && rarity==='common' && Math.random()<0.7) finalRarity='rare';
-  if(currentMission==='boss' && rarity==='rare'   && Math.random()<0.3) finalRarity='epic';
-  const eq = generateEquip(slotType, finalRarity);
+  const rarity = rollEquipRarity(isBoss);
+  const eq = generateEquip(slotType, rarity);
   const rarDef=EQUIP_RARITIES[finalRarity];
   equipDrops.push({x,y,eq,r:11,bobTime:rng(0,TAU),color:rarDef.color});
 }
@@ -1551,23 +1546,25 @@ function spawnWaveEnemy(){
   spawnEnemy(type,clamp(player.x+Math.cos(a)*d,60,WORLD_W-60),clamp(player.y+Math.sin(a)*d,60,WORLD_H-60));
 }
 function spawnBoss(){
-  // 1. 清除所有普通怪物
-  enemies.forEach(e=>{ if(!e.isBoss) e.alive=false; });
+  // 1. 立即清除所有普通怪物（从数组移除，不是标记alive=false）
+  for(let i=enemies.length-1;i>=0;i--){
+    if(!enemies[i].isBoss) enemies.splice(i,1);
+  }
 
   // 2. 以玩家当前位置为圆心设置竞技场
   arena.active  = true;
   arena.cx      = player.x;
   arena.cy      = player.y;
-  arena.r       = ARENA_RADIUS * 2.5;  // 从大到小过渡
+  arena.r       = ARENA_RADIUS * 2.5;
   arena.targetR = ARENA_RADIUS;
 
-  // 3. 在竞技场边缘刷出boss
+  // 3. 在竞技场边缘刷出boss，记录uid
   const a=rng(0,TAU);
   const bx=clamp(arena.cx+Math.cos(a)*(ARENA_RADIUS*0.7),100,WORLD_W-100);
   const by=clamp(arena.cy+Math.sin(a)*(ARENA_RADIUS*0.7),100,WORLD_H-100);
+  const bossUidBefore = _uid; // spawnEnemy 会 ++_uid
   spawnEnemy('boss',bx,by);
-  // 记录boss uid（刚push进去的最后一个）
-  arena.bossUid = enemies[enemies.length-1].uid;
+  arena.bossUid = _uid; // spawnEnemy 已经 ++_uid，现在 _uid 就是新boss的uid
 }
 
 function showWaveAnnounce(n,txt){
@@ -1876,12 +1873,10 @@ function dealDmg(e,dmg){
   spawnDmgText(e.x,e.y-e.r,Math.round(dmg),dmg>60?'#f9ca24':dmg>30?'#fd79a8':'#fff');
   spawnParticles(e.x,e.y,e.color,4,60,.28);
   if(e.hp<=0){
-    e.alive=false; killCount++; save.totalKills++;
-    Audio.kill();
-    // 经验宝石：往随机方向偏移，避免叠在一起
-    const gemAngle = rng(0, TAU);
-    const gemDist  = rng(12, 22);
-    spawnGem(e.x + Math.cos(gemAngle)*gemDist, e.y + Math.sin(gemAngle)*gemDist, e.xp);
+     e.alive=false; killCount++; save.totalKills++;
+     Audio.kill();
+     gainXP(e.xp); // 直接获得经验
+     const gemAngle = rng(0, TAU); // 保留角度变量供后续掉落偏移使用
     if(e.isBoss){
       bossesDefeated++;
       Audio.bossKill();
@@ -1895,7 +1890,7 @@ function dealDmg(e,dmg){
         arena.r=0;
       }
     }
-    const fd=e.fragDrop+(currentMission==='hard'?rngI(1,3):currentMission==='boss'?rngI(3,8):0);
+    const fd=e.fragDrop; // 碎片掉落量固定，不随关卡增加
     // 碎片：fragDrop>0才生成，与经验宝石相反方向偏移
     if(fd > 0){
       const fragAngle = gemAngle + Math.PI + rng(-0.5, 0.5);
@@ -1903,6 +1898,7 @@ function dealDmg(e,dmg){
       spawnFragPickup(e.x + Math.cos(fragAngle)*fragDist, e.y + Math.sin(fragAngle)*fragDist, fd);
     }
     // 图纸：垂直方向偏移
+    // 图纸掉落概率固定，不随关卡变化
     const bpChance=e.isBoss?.8:e.typeId==='elite'?.15:e.typeId==='tank'?.03:e.typeId==='shooter'?.02:.005;
     if(Math.random()<bpChance){
       const bpAngle = gemAngle + Math.PI/2 + rng(-0.3, 0.3);
@@ -1911,6 +1907,7 @@ function dealDmg(e,dmg){
     }
     // 装备掉落：小怪3%，精英15%（Boss已在上方单独处理）
     if(!e.isBoss){
+      // 装备掉落概率固定，不随关卡变化
       const eqChance = e.typeId==='elite'?.15:e.typeId==='tank'?.05:e.typeId==='shooter'?.03:.01;
       if(Math.random()<eqChance){
         const eqAngle=gemAngle-Math.PI/3+rng(-0.3,0.3);
@@ -1930,7 +1927,7 @@ function hurtPlayer(dmg){
 }
 function hurtPlayerContact(dmg){
   if(player.invincible>0) return;
-  const a=dmg*(1-player.armorPct); player.hp-=a; player.invincible=.5;
+  const a=dmg*(1-player.armorPct); player.hp-=a; player.invincible=.18;
   spawnParticles(player.x,player.y,'#e74c3c',7,110,.38);
   cam.x+=rng(-4,4); cam.y+=rng(-4,4);
   if(player.hp<=0){player.hp=0;endRun(false);}
@@ -1954,7 +1951,8 @@ function updateEnemies(delta){
       e.x=clamp(e.x+(rx/rm)*e.speed*delta,e.r,WORLD_W-e.r);
       e.y=clamp(e.y+(ry/rm)*e.speed*delta,e.r,WORLD_H-e.r);
     }
-    if(d<e.r+player.r) hurtPlayerContact(e.dmg*delta*2.5);
+    // 所有怪物接触玩家都造成伤害（包括射手/boss）
+    if(d<e.r+player.r+2) hurtPlayerContact(e.dmg*delta*3);
     if(e.shootRate>0){
       e.shootCooldown-=delta;
       if(e.shootCooldown<=0){
@@ -1970,14 +1968,7 @@ function updateEnemies(delta){
   }
 }
 
-function updateGems(delta){
-  for(let i=gems.length-1;i>=0;i--){
-    const g=gems[i]; g.bobTime+=delta*2.2;
-    const d=dist(player,g);
-    if(d<player.pickupRange+g.r){const ang=Math.atan2(player.y-g.y,player.x-g.x);g.x+=Math.cos(ang)*320*delta;g.y+=Math.sin(ang)*320*delta;}
-    if(dist(player,g)<player.r+g.r){gems.splice(i,1);gainXP(g.xp);}
-  }
-}
+function updateGems(delta){ /* 经验宝石已移除，经验直接在击杀时获得 */ }
 function updateFragPickups(delta){
   for(let i=fragPickups.length-1;i>=0;i--){
     const f=fragPickups[i]; f.bobTime+=delta*2;
@@ -2205,18 +2196,7 @@ function render(){
     ctx.restore();
   });
 
-  // gems
-  gems.forEach(g=>{
-    if(g.x<vx0||g.x>vx1||g.y<vy0||g.y>vy1) return;
-    const bob=Math.sin(g.bobTime)*2;
-    ctx.save(); ctx.translate(g.x,g.y+bob);
-    const gl=ctx.createRadialGradient(0,0,0,0,0,g.r*2);
-    gl.addColorStop(0,g.color+'88'); gl.addColorStop(1,'transparent');
-    ctx.beginPath(); ctx.arc(0,0,g.r*2,0,TAU); ctx.fillStyle=gl; ctx.fill();
-    ctx.beginPath(); ctx.moveTo(0,-g.r);ctx.lineTo(g.r*.72,0);ctx.lineTo(0,g.r);ctx.lineTo(-g.r*.72,0);ctx.closePath();
-    ctx.fillStyle=g.color; ctx.fill(); ctx.strokeStyle='#fff5'; ctx.lineWidth=1; ctx.stroke();
-    ctx.restore();
-  });
+  // gems 已移除（经验直接在击杀时获得）
   // boss drop items
   bossDropItems.forEach(d=>{
     if(d.x<vx0||d.x>vx1||d.y<vy0||d.y>vy1) return;
