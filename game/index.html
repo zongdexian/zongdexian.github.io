@@ -1992,7 +1992,13 @@ function gainXP(xp){
 }
 
 function showNextLevelUp(){
-  if(levelUpQueue<=0){levelUpActive=false;return;}
+  if(levelUpQueue<=0){
+    levelUpActive=false;
+    // BUG FIX: 队列耗尽时必须把 gState 改回 play，否则游戏永久卡在升级界面
+    if(gState==='levelup') gState='play';
+    document.getElementById('levelupScreen').style.display='none';
+    return;
+  }
   levelUpActive=true; levelUpQueue--; gState='levelup';
   Audio.levelUp();
   document.getElementById('levelupQueue').textContent=levelUpQueue>0?`还有 ${levelUpQueue} 次待选择`:'';
@@ -2377,8 +2383,8 @@ function gameLoop(ts){
   // pause 时只渲染，不更新
   if(gState==='pause'){
     render();
-    // 暂停状态不循环
-    return;
+    lastTs=0; // 清零，防止恢复时dt跳变
+    return;   // 暂停状态不继续调度，由 togglePause 重启
   }
   render();
   animFrame=requestAnimationFrame(gameLoop);
